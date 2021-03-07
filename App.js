@@ -4,8 +4,7 @@ import { StyleSheet, Text, View } from 'react-native';
 export default function App() {
   return (
     <View style={styles.container}>
-      <Text style={styles.mainText}>Trying to see myself in mobile dev again... Lol</Text>
-      <View style={styles.bottomLine} />
+      <Text style={styles.mainText}>Oh, shit. Here we go again...</Text>
     </View>
   );
 }
