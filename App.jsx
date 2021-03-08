@@ -2,8 +2,9 @@ import React from 'react';
 import { StyleSheet, SafeAreaView } from 'react-native';
 import * as Font from 'expo-font';
 
-
 import { NavigationProvider, Routes } from './context/Routes'
+
+console.disableYellowBox = true;
 
 export default function App() {
   const [fontsLoaded, error] = Font.useFonts({

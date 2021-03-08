@@ -1,9 +1,11 @@
 import React, { useState } from 'react'
 import { View, StyleSheet, Text, TouchableOpacity, ScrollView, FlatList, Dimensions } from 'react-native'
 
+// Importing screens
 import Passes from '../views/Passes'
 import Pass from '../views/Pass'
 import SunAndMoon from '../views/SunAndMoon'
+import UserCoords from '../views/UserCoords'
 
 import { Chevron } from '../components/icons/Chevron'
 
@@ -34,6 +36,11 @@ const menuItems = [
     name: '__SUN_AND_MOON__',
     title: () => 'Sun & Moon',
     component: SunAndMoon,
+  },
+  {
+    name: '__USER_COORDS__',
+    title: () => 'User coords',
+    component: UserCoords,
   },
 ]
 
@@ -199,7 +206,7 @@ const MenuStyles = StyleSheet.create({
     flex: 1,
   },
   heading: {
-    fontSize: 25,
+    fontSize: 18,
     fontFamily: "Orbitron-Medium",
     color: "#5F6D77",
     margin: 20,

@@ -4,6 +4,30 @@ import _ from 'lodash'
 
 import { useNavigation } from '../context/Routes'
 
+import Loader from '../components/Loader'
+
+const PassInProgress = () => {
+  return (
+    <View
+      style={{
+        marginTop: 5,
+        display: "flex",
+        flexDirection: "row",
+      }}
+    >
+      <Loader />
+
+      <Text
+        style={{
+          color: "#FFF",
+          marginLeft: 5,
+          fontFamily: "Orbitron-Regular",
+        }}
+      >Pass in progress...</Text>
+    </View>
+  )
+}
+
 export default () => {
   const { changeScreen } = useNavigation()
 
@@ -15,26 +39,38 @@ export default () => {
         keyExtractor={(_, index) => `pass-${index}`}
         data={randomSatsList}
         numColumns={1}
-        renderItem={({ item }) => {
+        renderItem={({ item, index }) => {
           return (
             <TouchableOpacity
               onPress={() => changeScreen('__PASS__', { satName: item.satName })}
-              style={[styles.pass, _.sample([styles.lowElevation, styles.midElevation, styles.highElevation])]}
+              style={[
+                {
+                  borderLeftWidth: 5,
+                  marginBottom: 10,
+                },
+                _.sample([styles.lowElevation, styles.midElevation, styles.highElevation]),
+              ]}
             >
-              <Text
-                style={{
-                  fontFamily: "Orbitron-Regular",
-                  fontSize: 25,
-                  color: "#FFF",
-                }}
-              >{item.satName}</Text>
+              <View style={styles.pass}>
+                <View>
+                  <Text
+                    style={{
+                      fontFamily: "Orbitron-Regular",
+                      fontSize: 25,
+                      color: "#FFF",
+                    }}
+                  >{item.satName}</Text>
 
-              <Text
-                style={{
-                  fontSize: 15,
-                  color: "#FFF"
-                }}
-              >Elev. 17*</Text>
+                  {index < 2 && <PassInProgress />}
+                </View>
+
+                <Text
+                  style={{
+                    fontSize: 15,
+                    color: "#FFF"
+                  }}
+                >Elev. 17°</Text>
+              </View>
             </TouchableOpacity>
           )
         }}
@@ -59,8 +95,6 @@ const styles = StyleSheet.create({
   pass: {
     width: "100%",
     padding: 10,
-    marginBottom: 10,
-    borderLeftWidth: 5,
     display: "flex",
     flexDirection: "row",
     justifyContent: "space-between",

@@ -3,7 +3,7 @@ import { View, Text, StyleSheet } from 'react-native'
 
 export default ({ params }) => {
   return (
-    <View style={{ padding: 20 }}>
+    <View style={{ paddingTop: 5, padding: 20 }}>
       <Text style={styles.header}>
         Sun & Moon
       </Text>
