@@ -1,8 +1,11 @@
 import React, { useState } from 'react'
-import { View, StyleSheet, Text, TouchableOpacity, ScrollView, FlatList, Button } from 'react-native'
+import { View, StyleSheet, Text, TouchableOpacity, ScrollView, FlatList, Dimensions } from 'react-native'
 
 import Passes from '../views/Passes'
 import Pass from '../views/Pass'
+import SunAndMoon from '../views/SunAndMoon'
+
+import { Chevron } from '../components/icons/Chevron'
 
 const INITIAL_SCREEN = '__PASSES__'
 
@@ -13,23 +16,36 @@ const context = React.createContext({
   changeScreen: () => {},
 })
 
+const nonMenuItems = [
+  {
+    name: '__PASS__',
+    title: ({ satName }) => `Pass - ${satName}`,
+    component: Pass,
+  },
+]
+
+const menuItems = [
+  {
+    name: '__PASSES__',
+    title: () => 'Upcoming passes overhead',
+    component: Passes,
+  },
+  {
+    name: '__SUN_AND_MOON__',
+    title: () => 'Sun & Moon',
+    component: SunAndMoon,
+  },
+]
+
+const width = Dimensions.get('window').width
+
 export const NavigationProvider = ({ children }) => {
   const { Provider } = context
 
   const screens = React.useMemo(() => [
-    {
-      name: '__PASSES__',
-      title: 'Passes',
-      inMenuList: true,
-      component: Passes,
-    },
-    {
-      name: '__PASS__',
-      title: 'Pass',
-      inMenuList: true,
-      component: Pass,
-    },
-  ])
+    ...nonMenuItems,
+    ...menuItems.map((item) => ({ ...item, inMenuList: true })),
+  ], [nonMenuItems, menuItems])
 
   const [currentScreen, setCurrentScreen] = React.useState(null)
   const [paramsToPass, setParamsToPass] = React.useState(null)
@@ -89,14 +105,28 @@ export const Routes = () => {
           MenuStyles.menu,
           showFullMenu ? MenuStyles.fullMenu : {},
         ]}
-        onPress={() => {
-          setShowFullMenu(!showFullMenu)
-          console.log('show full menu:', !showFullMenu)
-        }}
+        onPress={() => setShowFullMenu(!showFullMenu)}
       >
         {!showFullMenu && (
-          <Text style={{ fontSize: 20, color: "#FFF" }}>
-            {CurrentScreen && CurrentScreen.title}
+          <Text
+            style={{
+              fontSize: 15,
+              color: "#5F6D77",
+              display: "flex",
+              alignItems: "center",
+              textTransform: "uppercase",
+              fontFamily: "Orbitron-Regular",
+            }}
+          >
+            {CurrentScreen && CurrentScreen.title(paramsToPass)}
+
+            <View
+              style={{
+                transform: [{ scale: 1.3 }],
+              }}
+            >
+              <Chevron style={{ marginLeft: 5, marginBottom: 2 }} />
+            </View>
           </Text>
         )}
 
@@ -108,6 +138,8 @@ export const Routes = () => {
               numColumns={1}
               keyExtractor={(_, index) => `menu-item-${index}` }
               renderItem={({ item }) => {
+                console.log(item)
+
                 return (
                   <TouchableOpacity
                     style={MenuStyles.navItem}
@@ -116,7 +148,12 @@ export const Routes = () => {
                       setShowFullMenu(false)
                     }}
                   >
-                    <Text style={{ color: "#FFF" }}>{item.title}</Text>
+                    <Text
+                      style={{
+                        color: item.name === CurrentScreen.name ? "#FFF" : "#5F6D77",
+                        fontFamily: "Orbitron-Regular",
+                      }}
+                    >{item.title()}</Text>
                   </TouchableOpacity>
                 )
               }}
@@ -140,9 +177,13 @@ const MenuStyles = StyleSheet.create({
   navItem: {
     paddingVertical: 20,
     backgroundColor: "transparent",
+    alignSelf: "stretch",
     textTransform: "uppercase",
-    textAlign: "center",
+    paddingHorizontal: 10,
     fontFamily: "Arial",
+    borderBottomColor: "#383d40",
+    borderBottomWidth: 1,
+    width,
   },
   content: {
     flex: 1,
@@ -158,11 +199,11 @@ const MenuStyles = StyleSheet.create({
     flex: 1,
   },
   heading: {
-    fontSize: 20,
-    fontWeight: "bold",
+    fontSize: 25,
+    fontFamily: "Orbitron-Medium",
     color: "#5F6D77",
     margin: 20,
-    marginBottom: 5,
-    marginTop: 30,
+    marginBottom: 0,
+    marginTop: 40,
   },
 })

@@ -7,22 +7,34 @@ import { useNavigation } from '../context/Routes'
 export default () => {
   const { changeScreen } = useNavigation()
 
+  const randomSatsList = [1, 2, 3, 4, 5, 6, 7].map(() => ({ satName: _.sample(['NOAA-18', 'NOAA-19', 'NOAA-20', 'ISS']) }))
+
   return (
     <View style={{ padding: 20, paddingTop: 10 }}>
-      <Text style={styles.header}>Upcoming passes</Text>
-
       <FlatList
         keyExtractor={(_, index) => `pass-${index}`}
-        data={[1, 2, 3, 4, 5]}
+        data={randomSatsList}
         numColumns={1}
         renderItem={({ item }) => {
           return (
             <TouchableOpacity
-              onPress={() => changeScreen('__PASS__')}
+              onPress={() => changeScreen('__PASS__', { satName: item.satName })}
               style={[styles.pass, _.sample([styles.lowElevation, styles.midElevation, styles.highElevation])]}
             >
-              <Text style={{ fontSize: 25, color: "#FFF" }}>NOAA 18</Text>
-              <Text style={{ fontSize: 15, color: "#FFF" }}>Elev. 17*</Text>
+              <Text
+                style={{
+                  fontFamily: "Orbitron-Regular",
+                  fontSize: 25,
+                  color: "#FFF",
+                }}
+              >{item.satName}</Text>
+
+              <Text
+                style={{
+                  fontSize: 15,
+                  color: "#FFF"
+                }}
+              >Elev. 17*</Text>
             </TouchableOpacity>
           )
         }}
@@ -32,11 +44,6 @@ export default () => {
 }
 
 const styles = StyleSheet.create({
-  header: {
-    fontSize: 20,
-    color: "#FFF",
-    marginBottom: 10,
-  },
   highElevation: {
     backgroundColor: "rgba(34, 213, 184, .2)",
     borderLeftColor: "#22D5A4",
