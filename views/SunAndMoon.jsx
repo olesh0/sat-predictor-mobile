@@ -6,10 +6,12 @@ import Moon from '../components/icons/Moon'
 
 import DataList from '../components/DataList'
 
-import { useSunData } from '../hooks/useSunData'
+import { useSunData, useMoonData } from '../hooks'
+import { calculatePing } from '../utils'
 
 export default () => {
   const sun = useSunData()
+  const moon = useMoonData()
 
   return (
     <View style={{ paddingTop: 5, padding: 20 }}>
@@ -17,7 +19,7 @@ export default () => {
         Sun & Moon
       </Text>
 
-      <View style={{ marginTop: 20 }}>
+      <View style={{ marginTop: 30 }}>
         <View style={styles.sectionHeader}>
           <Sun width={50} height={50} />
 
@@ -28,7 +30,7 @@ export default () => {
         </View>
 
         <DataList
-          style={{ marginTop: 5 }}
+          style={{ marginTop: 10 }}
           data={[
             { label: 'Today\'s max. elevation', value: `${sun.maxElevation.elevation.toFixed(2)}°` },
             { label: 'Solar Noon', value: sun.noon.formatted },
@@ -41,28 +43,30 @@ export default () => {
         />
       </View>
 
-      <View style={{ marginTop: 20 }}>
+      <View style={{ marginTop: 30 }}>
         <View style={styles.sectionHeader}>
           <Moon width={50} height={50} />
 
-          <Text style={styles.currentLocation}>Bear. 84 | Elev. 79</Text>
+          <Text style={styles.currentLocation}>
+            Bear. {moon.current.azimuth.toFixed(0)}°
+            | Elev. {moon.current.altitude.toFixed(2)}°
+          </Text>
         </View>
 
         <DataList
-          style={{ marginTop: 5 }}
+          style={{ marginTop: 10 }}
           data={[
             { label: 'Set', value: '08/03 12:36 PM' },
             { label: 'Rise', value: '08/03 04:22 AM' },
-            { label: 'Distance', value: '375 196 km' },
-            { label: 'Fraction', value: '0.22' },
-            { label: 'Parallactic angle', value: '22.47°' },
+            { label: 'Distance', value: moon.current.distance.formatted },
+            {
+              label: 'Ping to moon',
+              value: `${calculatePing(moon.current.distance.raw, { decimal: 2 }).formatted}s`,
+            },
+            { label: 'Parallactic angle', value: `${moon.current.paralacticAngle.toFixed(2)}°` },
           ]}
         />
       </View>
-
-      {/* <Text>
-        {JSON.stringify(params, null, 2)}
-      </Text> */}
     </View>
   )
 }

@@ -145,8 +145,6 @@ export const Routes = () => {
               numColumns={1}
               keyExtractor={(_, index) => `menu-item-${index}` }
               renderItem={({ item }) => {
-                console.log(item)
-
                 return (
                   <TouchableOpacity
                     style={MenuStyles.navItem}
