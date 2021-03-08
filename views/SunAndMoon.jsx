@@ -6,7 +6,11 @@ import Moon from '../components/icons/Moon'
 
 import DataList from '../components/DataList'
 
+import { useSunData } from '../hooks/useSunData'
+
 export default () => {
+  const sun = useSunData()
+
   return (
     <View style={{ paddingTop: 5, padding: 20 }}>
       <Text style={styles.header}>
@@ -17,19 +21,22 @@ export default () => {
         <View style={styles.sectionHeader}>
           <Sun width={50} height={50} />
 
-          <Text style={styles.currentLocation}>Bear. 177 | Elev. 36</Text>
+          <Text style={styles.currentLocation}>
+            Bear. {sun.current.azimuth.toFixed(0)}°
+            | Elev. {sun.current.elevation.toFixed(2)}°
+          </Text>
         </View>
 
         <DataList
           style={{ marginTop: 5 }}
           data={[
-            { label: 'Today\'s Max. elevation', value: '90*' },
-            { label: 'Solar Noon', value: '12:32 PM' },
-            { label: 'Sunrise', value: '06:49 AM' },
-            { label: 'Sunset', value: '06:15 PM' },
-            { label: 'Dawn', value: '06:17 AM' },
-            { label: 'Dusk', value: '06:46 PM' },
-            { label: 'Nadir', value: '00:32 AM' },
+            { label: 'Today\'s max. elevation', value: `${sun.maxElevation.elevation.toFixed(2)}°` },
+            { label: 'Solar Noon', value: sun.noon.formatted },
+            { label: 'Sunrise', value: sun.sunrise.formatted },
+            { label: 'Sunset', value: sun.sunset.formatted },
+            { label: 'Dawn', value: sun.dawn.formatted },
+            { label: 'Dusk', value: sun.dusk.formatted },
+            { label: 'Nadir', value: sun.nadir.formatted },
           ]}
         />
       </View>
@@ -48,7 +55,7 @@ export default () => {
             { label: 'Rise', value: '08/03 04:22 AM' },
             { label: 'Distance', value: '375 196 km' },
             { label: 'Fraction', value: '0.22' },
-            { label: 'Parallactic angle', value: '22.47*' },
+            { label: 'Parallactic angle', value: '22.47°' },
           ]}
         />
       </View>
