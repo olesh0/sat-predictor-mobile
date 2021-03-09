@@ -1,4 +1,4 @@
-import React from 'react'
+import React, { useEffect, useState } from 'react'
 import { View, Text, StyleSheet } from 'react-native'
 
 import Sun from '../components/icons/Sun'
@@ -10,8 +10,23 @@ import { useSunData, useMoonData } from '../hooks'
 import { calculatePing } from '../utils'
 
 export default () => {
-  const sun = useSunData()
-  const moon = useMoonData()
+  const [sun, setSun] = useState(null)
+  const [moon, setMoon] = useState(null)
+
+  const calculateData = () => {
+    setSun(useSunData())
+    setMoon(useMoonData())
+  }
+
+  useEffect(() => {
+    calculateData()
+
+    const internal = setInterval(calculateData, 1000)
+
+    return () => clearInterval(internal)
+  }, [])
+
+  if (!sun || !moon) return <></>
 
   return (
     <View style={{ paddingTop: 5, padding: 20 }}>
