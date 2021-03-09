@@ -1,15 +1,11 @@
-import React, { useState } from 'react'
+import React, { useState, lazy, Suspense } from 'react'
 import { View, StyleSheet, Text, TouchableOpacity, ScrollView, FlatList, Dimensions } from 'react-native'
 
 // Importing screens
-import Passes from '../views/Passes'
-import Pass from '../views/Pass'
-import SunAndMoon from '../views/SunAndMoon'
-import UserCoords from '../views/UserCoords'
-
 import { Chevron } from '../components/icons/Chevron'
+import LoadingScreen from '../views/LoadingScreen'
 
-const INITIAL_SCREEN = '__PASSES__'
+const INITIAL_SCREEN = '__THEMES__' // '__PASSES__'
 
 const context = React.createContext({
   currentScreen: null,
@@ -22,7 +18,7 @@ const nonMenuItems = [
   {
     name: '__PASS__',
     title: ({ satName }) => `Pass - ${satName}`,
-    component: Pass,
+    component: lazy(() => import('../views/Pass')),
   },
 ]
 
@@ -30,17 +26,22 @@ const menuItems = [
   {
     name: '__PASSES__',
     title: () => 'Upcoming passes overhead',
-    component: Passes,
+    component: lazy(() => import('../views/Passes')),
   },
   {
     name: '__SUN_AND_MOON__',
     title: () => 'Sun & Moon',
-    component: SunAndMoon,
+    component: lazy(() => import('../views/SunAndMoon')),
   },
   {
     name: '__USER_COORDS__',
     title: () => 'User coords',
-    component: UserCoords,
+    component: lazy(() => import('../views/UserCoords')),
+  },
+  {
+    name: '__THEMES__',
+    title: () => 'Themes',
+    component: lazy(() => import('../views/Themes')),
   },
 ]
 
@@ -100,73 +101,83 @@ export const Routes = () => {
   const menuListRoutes = screens.filter(({ inMenuList }) => inMenuList)
 
   return (
-    <View style={MenuStyles.wrapper}>
-      <Text style={MenuStyles.heading}>Sat Predictor</Text>
+    <Suspense
+      fallback={
+        <LoadingScreen />
+      }
+    >
+      <View style={MenuStyles.wrapper}>
+        <Text style={MenuStyles.heading}>Sat Predictor</Text>
 
-      <ScrollView style={MenuStyles.content}>
-        {CurrentScreen && CurrentScreen.component && <CurrentScreen.component params={paramsToPass} />}
-      </ScrollView>
+        <ScrollView style={MenuStyles.content}>
+          {
+            CurrentScreen
+            && CurrentScreen.component
+            && <CurrentScreen.component params={paramsToPass} />
+          }
+        </ScrollView>
 
-      <TouchableOpacity
-        style={[
-          MenuStyles.menu,
-          showFullMenu ? MenuStyles.fullMenu : {},
-        ]}
-        onPress={() => setShowFullMenu(!showFullMenu)}
-      >
-        {!showFullMenu && (
-          <Text
-            style={{
-              fontSize: 15,
-              color: "#5F6D77",
-              display: "flex",
-              alignItems: "center",
-              textTransform: "uppercase",
-              fontFamily: "Orbitron-Regular",
-            }}
-          >
-            {CurrentScreen && CurrentScreen.title(paramsToPass)}
-
-            <View
+        <TouchableOpacity
+          style={[
+            MenuStyles.menu,
+            showFullMenu ? MenuStyles.fullMenu : {},
+          ]}
+          onPress={() => setShowFullMenu(!showFullMenu)}
+        >
+          {!showFullMenu && (
+            <Text
               style={{
-                transform: [{ scale: 1.3 }],
+                fontSize: 15,
+                color: "#5F6D77",
+                display: "flex",
+                alignItems: "center",
+                textTransform: "uppercase",
+                fontFamily: "Orbitron-Regular",
               }}
             >
-              <Chevron style={{ marginLeft: 5, marginBottom: 2 }} />
-            </View>
-          </Text>
-        )}
+              {CurrentScreen && CurrentScreen.title(paramsToPass)}
 
-        {showFullMenu && (
-          <ScrollView>
-            <FlatList
-              contentContainerStyle={MenuStyles.screensList}
-              data={menuListRoutes || []}
-              numColumns={1}
-              keyExtractor={(_, index) => `menu-item-${index}` }
-              renderItem={({ item }) => {
-                return (
-                  <TouchableOpacity
-                    style={MenuStyles.navItem}
-                    onPress={() => {
-                      changeScreen(item.name)
-                      setShowFullMenu(false)
-                    }}
-                  >
-                    <Text
-                      style={{
-                        color: item.name === CurrentScreen.name ? "#FFF" : "#5F6D77",
-                        fontFamily: "Orbitron-Regular",
+              <View
+                style={{
+                  transform: [{ scale: 1.3 }],
+                }}
+              >
+                <Chevron style={{ marginLeft: 5, marginBottom: 2 }} />
+              </View>
+            </Text>
+          )}
+
+          {showFullMenu && (
+            <ScrollView>
+              <FlatList
+                contentContainerStyle={MenuStyles.screensList}
+                data={menuListRoutes || []}
+                numColumns={1}
+                keyExtractor={(_, index) => `menu-item-${index}` }
+                renderItem={({ item }) => {
+                  return (
+                    <TouchableOpacity
+                      style={MenuStyles.navItem}
+                      onPress={() => {
+                        changeScreen(item.name)
+                        setShowFullMenu(false)
                       }}
-                    >{item.title()}</Text>
-                  </TouchableOpacity>
-                )
-              }}
-            />
-          </ScrollView>
-        )}
-      </TouchableOpacity>
-    </View>
+                    >
+                      <Text
+                        style={{
+                          color: item.name === CurrentScreen.name ? "#FFF" : "#5F6D77",
+                          fontFamily: "Orbitron-Regular",
+                        }}
+                      >{item.title()}</Text>
+                    </TouchableOpacity>
+                  )
+                }}
+              />
+            </ScrollView>
+          )}
+        </TouchableOpacity>
+      </View>
+    </Suspense>
   )
 }
 
