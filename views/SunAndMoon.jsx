@@ -8,8 +8,12 @@ import DataList from '../components/DataList'
 
 import { useSunData, useMoonData } from '../hooks'
 import { calculatePing } from '../utils'
+import { useTheme } from '../context/Theme'
 
 export default () => {
+  const { theme } = useTheme()
+  const styles = stylesGenerator(theme)
+
   const [sun, setSun] = useState(null)
   const [moon, setMoon] = useState(null)
 
@@ -86,21 +90,23 @@ export default () => {
   )
 }
 
-const styles = StyleSheet.create({
-  header: {
-    fontSize: 25,
-    color: "#FFF",
-    fontFamily: "Orbitron-Bold",
-  },
-  sectionHeader: {
-    display: "flex",
-    justifyContent: "space-between",
-    flexDirection: "row",
-    alignItems: "center"
-  },
-  currentLocation: {
-    color: "#FFF",
-    fontSize: 17,
-    fontFamily: "Orbitron-Regular",
-  },
-})
+const stylesGenerator = (theme) => (
+  StyleSheet.create({
+    header: {
+      fontSize: 25,
+      color: theme.colors.colorFontMain,
+      fontFamily: "Orbitron-Bold",
+    },
+    sectionHeader: {
+      display: "flex",
+      justifyContent: "space-between",
+      flexDirection: "row",
+      alignItems: "center"
+    },
+    currentLocation: {
+      color: theme.colors.colorFontMain,
+      fontSize: 17,
+      fontFamily: "Orbitron-Regular",
+    },
+  })
+)

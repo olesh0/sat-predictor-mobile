@@ -1,7 +1,11 @@
 import React, { useState } from 'react'
 import { View, StyleSheet, TextInput, Text, Alert, TouchableOpacity } from 'react-native'
+import { useTheme } from '../context/Theme'
 
-export default ({ params }) => {
+export default () => {
+  const { theme } = useTheme()
+  const styles = stylesGenerator(theme)
+
   const [latitude, setLatitude] = useState(0)
   const [longitude, setLongitude] = useState(0)
 
@@ -23,7 +27,7 @@ export default ({ params }) => {
           onChangeText={(updatedLatitude) => setLatitude(updatedLatitude)}
           value={latitude}
           placeholder="Your Latitude..."
-          placeholderTextColor="#5F6D77"
+          placeholderTextColor={theme.colors.colorFontDark}
         />
       </View>
 
@@ -37,7 +41,7 @@ export default ({ params }) => {
           onChangeText={(updatedLongitude) => setLongitude(updatedLongitude)}
           value={longitude}
           placeholder="Your Longitude..."
-          placeholderTextColor="#5F6D77"
+          placeholderTextColor={theme.colors.colorFontDark}
         />
       </View>
 
@@ -45,63 +49,56 @@ export default ({ params }) => {
         style={[styles.button, styles.saveButton]}
         onPress={() => Alert.alert("All saved")}
       >
-        <Text
-          style={{
-            color: "#000",
-            fontFamily: "Orbitron-Regular",
-            fontSize: 18,
-            textAlign: "center",
-            padding: 10,
-          }}
-        >Save my coords</Text>
+        <Text style={styles.saveButtonText}>Save my coords</Text>
       </TouchableOpacity>
 
       <TouchableOpacity
         style={[styles.button, styles.autoFetchCoordsButton]}
         onPress={() => Alert.alert("Fetched.")}
       >
-        <Text
-          style={{
-            color: "#000",
-            fontFamily: "Orbitron-Regular",
-            fontSize: 18,
-            textAlign: "center",
-            padding: 10,
-          }}
-        >Auto-fetch coords</Text>
+        <Text style={styles.saveButtonText}>Auto-fetch coords</Text>
       </TouchableOpacity>
     </View>
   )
 }
 
-const styles = StyleSheet.create({
-  satName: {
-    fontSize: 25,
-    color: "#FFF",
-    fontFamily: "Orbitron-Bold",
-  },
-  label: {
-    color: "#5F6D77",
-    marginBottom: 5,
-  },
-  TextInput: {
-    height: 40,
-    paddingHorizontal: 10,
-    paddingVertical: 5,
-    borderRadius: 3,
-    color: "#FFF",
-    backgroundColor: "rgba(255, 255, 255, .04)",
-  },
-  button: {
-    flex: 1,
-    flexDirection: "column",
-    marginTop: 10,
-    borderRadius: 3,
-  },
-  saveButton: {
-    backgroundColor: "#22D5A4",
-  },
-  autoFetchCoordsButton: {
-    backgroundColor: "#D52222",
-  },
-})
+const stylesGenerator = (theme) => (
+  StyleSheet.create({
+    satName: {
+      fontSize: 25,
+      color: theme.colors.colorFontMain,
+      fontFamily: "Orbitron-Bold",
+    },
+    label: {
+      color: theme.colors.colorFontDark,
+      marginBottom: 5,
+    },
+    TextInput: {
+      height: 40,
+      paddingHorizontal: 10,
+      paddingVertical: 5,
+      borderRadius: 3,
+      color: theme.colors.colorFontMain,
+      backgroundColor: theme.colors.colorBgUserCoordsInput,
+    },
+    button: {
+      flex: 1,
+      flexDirection: "column",
+      marginTop: 10,
+      borderRadius: 3,
+    },
+    saveButton: {
+      backgroundColor: theme.colors.colorAccentGreen,
+    },
+    saveButtonText: {
+      color: theme.colors.coordsButtonFontColor,
+      fontFamily: "Orbitron-Regular",
+      fontSize: 18,
+      textAlign: "center",
+      padding: 10,
+    },
+    autoFetchCoordsButton: {
+      backgroundColor: theme.colors.colorAccentRed,
+    },
+  })
+)

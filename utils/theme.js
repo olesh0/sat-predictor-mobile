@@ -3,10 +3,31 @@ import { THEME } from './async-storage-keys'
 import { DEFAULT_COLOR_THEME } from './contants'
 import { THEMES_LIST } from '../themes'
 
-export const getCurrentTheme = async () => {
-  const theme = await AsyncStorage.getItem(THEME) || DEFAULT_COLOR_THEME
-
-  return THEMES_LIST.find(({ slug }) => slug === theme)
+export let currentTheme = {
+  colors: {},
+  name: null,
+  slug: null,
 }
 
-export const setTheme = (themeName) => AsyncStorage.setItem(THEME, themeName)
+export const getCurrentTheme = async () => {
+  if (currentTheme && currentTheme.name) {
+    return currentTheme
+  }
+
+  const theme = await AsyncStorage.getItem(THEME)
+  const defaultSchema = THEMES_LIST.find(({ slug }) => slug === DEFAULT_COLOR_THEME)
+
+  currentTheme = THEMES_LIST.find(({ slug }) => slug === theme) || defaultSchema
+
+  return currentTheme
+}
+
+export const setTheme = async (themeSlug) => {
+  const theme = THEMES_LIST.find(({ slug }) => slug === themeSlug)
+
+  if (!theme) return
+
+  currentTheme = theme
+
+  return AsyncStorage.setItem(THEME, themeSlug)
+}

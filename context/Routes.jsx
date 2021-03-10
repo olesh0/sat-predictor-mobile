@@ -4,6 +4,7 @@ import { View, StyleSheet, Text, TouchableOpacity, ScrollView, FlatList, Dimensi
 // Importing screens
 import { Chevron } from '../components/icons/Chevron'
 import LoadingScreen from '../views/LoadingScreen'
+import { useTheme } from './Theme'
 
 const INITIAL_SCREEN = '__THEMES__' // '__PASSES__'
 
@@ -90,6 +91,9 @@ export const NavigationProvider = ({ children }) => {
 
 export const Routes = () => {
   const [showFullMenu, setShowFullMenu] = useState(false)
+  const { theme } = useTheme()
+
+  const MenuStyles = MenuStylesGenerator(theme)
 
   const {
     currentScreen: CurrentScreen,
@@ -128,7 +132,7 @@ export const Routes = () => {
             <Text
               style={{
                 fontSize: 15,
-                color: "#5F6D77",
+                color: theme.colors.colorFontDark,
                 display: "flex",
                 alignItems: "center",
                 textTransform: "uppercase",
@@ -165,7 +169,7 @@ export const Routes = () => {
                     >
                       <Text
                         style={{
-                          color: item.name === CurrentScreen.name ? "#FFF" : "#5F6D77",
+                          color: item.name === CurrentScreen.name ? theme.colors.colorFontMain : theme.colors.colorFontDark,
                           fontFamily: "Orbitron-Regular",
                         }}
                       >{item.title()}</Text>
@@ -186,40 +190,42 @@ export const useNavigation = () => {
 }
 
 
-const MenuStyles = StyleSheet.create({
-  wrapper: {
-    flex: 1,
-  },
-  navItem: {
-    paddingVertical: 20,
-    backgroundColor: "transparent",
-    alignSelf: "stretch",
-    textTransform: "uppercase",
-    paddingHorizontal: 10,
-    fontFamily: "Arial",
-    borderBottomColor: "#383d40",
-    borderBottomWidth: 1,
-    width,
-  },
-  content: {
-    flex: 1,
-  },
-  menu: {
-    padding: 20,
-    backgroundColor: "#242729",
-    display: "flex",
-    justifyContent: "center",
-    alignItems: "center",
-  },
-  fullMenu: {
-    flex: 1,
-  },
-  heading: {
-    fontSize: 18,
-    fontFamily: "Orbitron-Medium",
-    color: "#5F6D77",
-    margin: 20,
-    marginBottom: 0,
-    marginTop: 40,
-  },
-})
+const MenuStylesGenerator = (theme) => (
+  StyleSheet.create({
+    wrapper: {
+      flex: 1,
+    },
+    navItem: {
+      paddingVertical: 20,
+      backgroundColor: "transparent",
+      alignSelf: "stretch",
+      textTransform: "uppercase",
+      paddingHorizontal: 10,
+      fontFamily: "Arial",
+      borderBottomColor: theme.colors.colorFontDark,
+      borderBottomWidth: 1,
+      width,
+    },
+    content: {
+      flex: 1,
+    },
+    menu: {
+      padding: 20,
+      backgroundColor: theme.colors.colorBgLight,
+      display: "flex",
+      justifyContent: "center",
+      alignItems: "center",
+    },
+    fullMenu: {
+      flex: 1,
+    },
+    heading: {
+      fontSize: 18,
+      fontFamily: "Orbitron-Medium",
+      color: theme.colors.colorFontDark,
+      margin: 20,
+      marginBottom: 0,
+      marginTop: 40,
+    },
+  })
+)

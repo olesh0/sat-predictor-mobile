@@ -3,8 +3,12 @@ import { Text, View, StyleSheet } from 'react-native'
 
 import DataList from '../components/DataList'
 import Loader from '../components/Loader'
+import { useTheme } from '../context/Theme'
 
 export default ({ params }) => {
+  const { theme } = useTheme()
+  const styles = stylesGenerator(theme)
+
   const progressWrapper = useRef()
   const [progressBarWidth, setProgressBarWidth] = useState(0)
 
@@ -76,28 +80,30 @@ export default ({ params }) => {
   )
 }
 
-const styles = StyleSheet.create({
-  satName: {
-    fontSize: 25,
-    color: "#FFF",
-    fontFamily: "Orbitron-Bold",
-  },
-  progress: {
-    display: "flex",
-    flexDirection: "row",
-    alignItems: "center",
-    marginTop: 20,
-  },
-  progressBarWrapper: {
-    flex: 1,
-    marginLeft: 10,
-    height: 5,
-    borderRadius: 10,
-    overflow: "hidden",
-    backgroundColor: "rgba(213, 34, 34, .2)",
-  },
-  progressBar: {
-    height: 5,
-    backgroundColor: "#D52222",
-  },
-})
+const stylesGenerator = (theme) => (
+  StyleSheet.create({
+    satName: {
+      fontSize: 25,
+      color: theme.colors.colorFontMain,
+      fontFamily: "Orbitron-Bold",
+    },
+    progress: {
+      display: "flex",
+      flexDirection: "row",
+      alignItems: "center",
+      marginTop: 20,
+    },
+    progressBarWrapper: {
+      flex: 1,
+      marginLeft: 10,
+      height: 5,
+      borderRadius: 10,
+      overflow: "hidden",
+      backgroundColor: theme.colors.colorHighlightRed,
+    },
+    progressBar: {
+      height: 5,
+      backgroundColor: theme.colors.colorAccentRed,
+    },
+  })
+)

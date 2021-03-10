@@ -1,11 +1,12 @@
 import React, { useRef, useEffect } from 'react'
 import { Animated, StyleSheet } from 'react-native'
 
-const DURATION = 500
+const DURATION = 300
 
-export default () => {
+export default ({ color = "#22D5A4" }) => {
   const middleBarAnim = useRef(new Animated.Value(0)).current
   const sideBarsAnim = useRef(new Animated.Value(15)).current
+  const styles = stylesGenerator(color)
 
   // side => -1 means to the initial values, side => +1 means the opposite
   const runAnimation = (side = -1) => {
@@ -61,23 +62,25 @@ export default () => {
   )
 }
 
-const styles = StyleSheet.create({
-  wrapper: {
-    display: "flex",
-    flexDirection: "row",
-    alignItems: "center",
-    height: 15,
-  },
-  bar: {
-    borderRadius: 10,
-    width: 2,
-    backgroundColor: "#22D5A4",
-    marginHorizontal: 2,
-  },
-  barSide: {
-    height: 5,
-  },
-  barMiddle: {
-    height: 15,
-  },
-})
+const stylesGenerator = (barColor) => (
+  StyleSheet.create({
+    wrapper: {
+      display: "flex",
+      flexDirection: "row",
+      alignItems: "center",
+      height: 15,
+    },
+    bar: {
+      borderRadius: 10,
+      width: 2,
+      backgroundColor: barColor,
+      marginHorizontal: 2,
+    },
+    barSide: {
+      height: 5,
+    },
+    barMiddle: {
+      height: 15,
+    },
+  })
+)

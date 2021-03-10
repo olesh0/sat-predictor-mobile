@@ -1,7 +1,11 @@
 import React from 'react'
 import { FlatList, StyleSheet, View, Text } from 'react-native'
+import { useTheme } from '../context/Theme'
 
 export default ({ data, ...props }) => {
+  const { theme } = useTheme()
+  const styles = stylesGenerator(theme)
+
   const defaultData = [
     { label: 'Lol', value: 'You should probably provide "data" variable...' },
   ]
@@ -26,26 +30,28 @@ export default ({ data, ...props }) => {
   )
 }
 
-const styles = StyleSheet.create({
-  dataList: {
-    marginVertical: 10,
-  },
-  dataListItem: {
-    marginBottom: 8,
-    flex: 1,
-    alignSelf: "stretch",
-    flexDirection: "row",
-  },
-  listLabel: {
-    flex: 1,
-    alignSelf: "stretch",
-    color: "#5F6D77",
-    fontFamily: "Orbitron-Regular"
-  },
-  listValue: {
-    flex: 1,
-    alignSelf: "stretch",
-    color: "#22D5A4",
-    fontFamily: "Orbitron-Regular"
-  },
-})
+const stylesGenerator = (theme) => (
+  StyleSheet.create({
+    dataList: {
+      marginVertical: 10,
+    },
+    dataListItem: {
+      marginBottom: 8,
+      flex: 1,
+      alignSelf: "stretch",
+      flexDirection: "row",
+    },
+    listLabel: {
+      flex: 1,
+      alignSelf: "stretch",
+      color: theme.colors.colorFontDark,
+      fontFamily: "Orbitron-Regular"
+    },
+    listValue: {
+      flex: 1,
+      alignSelf: "stretch",
+      color: theme.colors.colorAccentGreen,
+      fontFamily: "Orbitron-Regular"
+    },
+  })
+)

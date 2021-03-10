@@ -5,8 +5,24 @@ import _ from 'lodash'
 import { useNavigation } from '../context/Routes'
 
 import Loader from '../components/Loader'
+import { useTheme } from '../context/Theme'
 
-const PassInProgress = () => {
+const PassInProgress = ({ elevation }) => {
+  const { theme } = useTheme()
+
+  const styles = {
+    high: {
+      color: theme.colors.colorAccentGreen,
+    },
+    low: {
+      color: theme.colors.colorAccentRed,
+    },
+    mid: {
+      color: theme.colors.colorAccentPurple,
+    },
+  }
+
+
   return (
     <View
       style={{
@@ -15,20 +31,25 @@ const PassInProgress = () => {
         flexDirection: "row",
       }}
     >
-      <Loader />
+      <Loader color={styles[elevation].color} />
 
       <Text
-        style={{
-          color: "#FFF",
-          marginLeft: 5,
-          fontFamily: "Orbitron-Regular",
-        }}
+        style={[
+          {
+            marginLeft: 5,
+            fontFamily: "Orbitron-Regular",
+          },
+          styles[elevation],
+        ]}
       >Pass in progress...</Text>
     </View>
   )
 }
 
 export default () => {
+  const { theme } = useTheme()
+  const styles = stylesGenerator(theme)
+
   const { changeScreen } = useNavigation()
 
   const randomSatsList = [1, 2, 3, 4, 5, 6, 7].map(() => ({ satName: _.sample(['NOAA-18', 'NOAA-19', 'NOAA-20', 'ISS']) }))
@@ -40,6 +61,8 @@ export default () => {
         data={randomSatsList}
         numColumns={1}
         renderItem={({ item, index }) => {
+          const elevation = _.sample(['high', 'low', 'mid'])
+
           return (
             <TouchableOpacity
               onPress={() => changeScreen('__PASS__', { satName: item.satName })}
@@ -48,7 +71,7 @@ export default () => {
                   borderLeftWidth: 5,
                   marginBottom: 10,
                 },
-                _.sample([styles.lowElevation, styles.midElevation, styles.highElevation]),
+                styles[`${elevation}Elevation`],
               ]}
             >
               <View style={styles.pass}>
@@ -57,17 +80,20 @@ export default () => {
                     style={{
                       fontFamily: "Orbitron-Regular",
                       fontSize: 25,
-                      color: "#FFF",
+                      color: theme.colors.colorFontMain,
                     }}
                   >{item.satName}</Text>
 
-                  {index < 2 && <PassInProgress />}
+                  {index < 2 && (
+                    <PassInProgress elevation={elevation} />
+                  )}
                 </View>
 
                 <Text
                   style={{
                     fontSize: 15,
-                    color: "#FFF"
+                    color: theme.colors.colorFontMain,
+                    fontFamily: "Orbitron-Regular",
                   }}
                 >Elev. 17°</Text>
               </View>
@@ -79,25 +105,27 @@ export default () => {
   )
 }
 
-const styles = StyleSheet.create({
-  highElevation: {
-    backgroundColor: "rgba(34, 213, 184, .2)",
-    borderLeftColor: "#22D5A4",
-  },
-  lowElevation: {
-    backgroundColor: "rgba(213, 34, 34, .2)",
-    borderLeftColor: "#D52222",
-  },
-  midElevation: {
-    backgroundColor: "rgba(142, 34, 213, .2)",
-    borderLeftColor: "#8E22D5",
-  },
-  pass: {
-    width: "100%",
-    padding: 10,
-    display: "flex",
-    flexDirection: "row",
-    justifyContent: "space-between",
-    alignItems: "center",
-  },
-})
+const stylesGenerator = (theme) => (
+  StyleSheet.create({
+    highElevation: {
+      backgroundColor: theme.colors.colorHighlightGreen,
+      borderLeftColor: theme.colors.colorAccentGreen,
+    },
+    lowElevation: {
+      backgroundColor: theme.colors.colorHighlightRed,
+      borderLeftColor: theme.colors.colorAccentRed,
+    },
+    midElevation: {
+      backgroundColor: theme.colors.colorHighlightPurple,
+      borderLeftColor: theme.colors.colorAccentPurple,
+    },
+    pass: {
+      width: "100%",
+      padding: 10,
+      display: "flex",
+      flexDirection: "row",
+      justifyContent: "space-between",
+      alignItems: "center",
+    },
+  })
+)
