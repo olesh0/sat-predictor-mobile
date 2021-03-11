@@ -70,6 +70,7 @@ export default () => {
                 {
                   borderLeftWidth: 5,
                   marginBottom: 10,
+                  paddingVertical: 10,
                 },
                 styles[`${elevation}Elevation`],
               ]}

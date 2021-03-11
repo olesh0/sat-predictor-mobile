@@ -1,22 +1,22 @@
-import { THEME_LIGHT } from './types'
+import { THEME_DARK } from '../types'
 
 export default {
-  name: 'Default light',
-  slug: 'default-light',
-  type: THEME_LIGHT,
+  name: 'Absolute dark',
+  slug: 'absolute-dark',
+  type: THEME_DARK,
   colors: {
-    colorBgDark: '#bdbbbb', // main bg
-    colorBgLight: '#dddddd',
+    colorBgDark: '#070808', // main bg
+    colorBgLight: '#121414',
 
-    colorFontDark: '#7b8a94',
-    colorFontLight: '#646e75',
-    colorFontMain: '#4e4e50',
+    colorFontDark: '#455058',
+    colorFontLight: '#68747c',
+    colorFontMain: '#eee',
 
-    colorAccentGreen: '#1cb68d',
-    colorAccentRed: '#a81a1a',
+    colorAccentGreen: '#22d5a4',
+    colorAccentRed: '#d52222',
     colorAccentPurple: '#6c19a3',
 
-    colorBgUserCoordsInput: 'rgba(255, 255, 255, .3)',
+    colorBgUserCoordsInput: 'rgba(255, 255, 255, .05)',
     coordsButtonFontColor: '#000',
 
     colorHighlightGreen: 'rgba(34, 213, 164, .4)',

@@ -1,4 +1,4 @@
-import React, { useEffect, useMemo, useRef, useState } from 'react'
+import React, { useEffect, useMemo, useState } from 'react'
 import { Text, View, StyleSheet } from 'react-native'
 
 import DataList from '../components/DataList'
@@ -7,33 +7,15 @@ import { useTheme } from '../context/Theme'
 
 export default ({ params }) => {
   const { theme } = useTheme()
-  const styles = stylesGenerator(theme)
+  const styles = useMemo(() => stylesGenerator(theme), [theme])
 
-  const progressWrapper = useRef()
-  const [progressBarWidth, setProgressBarWidth] = useState(0)
-
-  const calculateProgressWidth = (percents) => {
-    if (!progressWrapper || !progressWrapper.current) return 0
-
-    const progressBarTotalWidth = progressWrapper.current.clientWidth
-    const width = progressBarTotalWidth * (percents / 100)
-
-    return width || 0
-  }
+  const [percents, setPercents] = useState(0)
+  const [progressBarTotalWidth, setProgressBarTotalWidth] = useState(0)
 
   useEffect(() => {
-    let perc = 0
-    setProgressBarWidth(calculateProgressWidth(0))
+    const interval = setInterval(() => setPercents((perc) => perc < 100 ? perc += 0.5 : 0), 500)
 
-    const progressBarWidthInterval = setInterval(() => {
-      perc += 0.5
-
-      if (perc >= 100) perc = 0
-
-      setProgressBarWidth(calculateProgressWidth(perc))
-    }, 1000)
-
-    return () => clearInterval(progressBarWidthInterval)
+    return () => clearInterval(interval)
   }, [])
 
   const dataList = useMemo(() => [
@@ -55,8 +37,6 @@ export default ({ params }) => {
         padding: 20,
       }}
     >
-      {/* TODO: Debug why progress bar is not updating on mobile */}
-
       <View style={styles.content}>
         <Text style={styles.satName}>{params.satName}</Text>
 
@@ -68,11 +48,11 @@ export default ({ params }) => {
 
         <View
           style={styles.progressBarWrapper}
-          ref={progressWrapper}
+          onLayout={(event) => setProgressBarTotalWidth(event.nativeEvent.layout.width)}
         >
           <View style={[
             styles.progressBar,
-            { width: progressBarWidth }
+            { width: progressBarTotalWidth * (percents / 100) }
           ]}></View>
         </View>
       </View>

@@ -6,7 +6,7 @@ import { Chevron } from '../components/icons/Chevron'
 import LoadingScreen from '../views/LoadingScreen'
 import { useTheme } from './Theme'
 
-const INITIAL_SCREEN = '__THEMES__' // '__PASSES__'
+const INITIAL_SCREEN = '__PASSES__'
 
 const context = React.createContext({
   currentScreen: null,
@@ -169,7 +169,7 @@ export const Routes = () => {
                     >
                       <Text
                         style={{
-                          color: item.name === CurrentScreen.name ? theme.colors.colorFontMain : theme.colors.colorFontDark,
+                          color: item.name === CurrentScreen.name ? theme.colors.colorAccentGreen : theme.colors.colorFontDark,
                           fontFamily: "Orbitron-Regular",
                         }}
                       >{item.title()}</Text>

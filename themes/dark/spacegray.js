@@ -1,22 +1,22 @@
-import { THEME_DARK } from './types'
+import { THEME_DARK } from '../types'
 
 export default {
-  name: 'Default dark',
-  slug: 'default-dark',
+  name: 'Spacegray',
+  slug: 'spacegray',
   type: THEME_DARK,
   colors: {
-    colorBgDark: '#17191A', // main bg
-    colorBgLight: '#242729',
+    colorBgDark: '#343d46', // main bg
+    colorBgLight: '#4e5c68',
 
-    colorFontDark: '#5F6D77',
+    colorFontDark: '#9ba9b6',
     colorFontLight: '#848F97',
-    colorFontMain: '#EEE',
+    colorFontMain: '#eee',
 
     colorAccentGreen: '#22d5a4',
-    colorAccentRed: '#d52222',
+    colorAccentRed: '#ff0000',
     colorAccentPurple: '#8E22D5',
 
-    colorBgUserCoordsInput: 'rgba(255, 255, 255, .04)',
+    colorBgUserCoordsInput: 'rgba(255, 255, 255, .05)',
     coordsButtonFontColor: '#000',
 
     colorHighlightGreen: 'rgba(34, 213, 164, .4)',
