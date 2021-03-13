@@ -6,7 +6,7 @@ import { Chevron } from '../components/icons/Chevron'
 import LoadingScreen from '../views/LoadingScreen'
 import { useTheme } from './Theme'
 
-const INITIAL_SCREEN = '__PASSES__'
+const INITIAL_SCREEN = '__SATELLITES__'
 
 const context = React.createContext({
   currentScreen: null,
@@ -18,12 +18,22 @@ const context = React.createContext({
 const nonMenuItems = [
   {
     name: '__PASS__',
-    title: ({ satName }) => `Pass - ${satName}`,
+    title: ({ satellite }) => `Pass - ${satellite.name}`,
     component: lazy(() => import('../views/Pass')),
+  },
+  {
+    name: '__SATELLITE__',
+    title: ({ name }) => `Satellite - ${name}`,
+    component: lazy(() => import('../views/Satellite')),
   },
 ]
 
 const menuItems = [
+  {
+    name: '__SATELLITES__',
+    title: () => 'Satellites list',
+    component: lazy(() => import('../views/Satellites')),
+  },
   {
     name: '__PASSES__',
     title: () => 'Upcoming passes overhead',
@@ -59,15 +69,12 @@ export const NavigationProvider = ({ children }) => {
   const [currentScreen, setCurrentScreen] = React.useState(null)
   const [paramsToPass, setParamsToPass] = React.useState(null)
 
-  const changeScreen = (screenName, params = {}) => {
+  const changeScreen = async (screenName, params = {}) => {
     const screen = screens.find(({ name }) => screenName === name)
-
-    console.log('changing screen...', { screenName, params }, screen)
 
     if (!screen) return
 
-    params && setParamsToPass(params)
-
+    setParamsToPass(params)
     setCurrentScreen(screen)
   }
 
@@ -124,7 +131,7 @@ export const Routes = () => {
         <TouchableOpacity
           style={[
             MenuStyles.menu,
-            showFullMenu ? MenuStyles.fullMenu : {},
+            showFullMenu && { flex: 1 },
           ]}
           onPress={() => setShowFullMenu(!showFullMenu)}
         >
@@ -189,7 +196,6 @@ export const useNavigation = () => {
   return React.useContext(context)
 }
 
-
 const MenuStylesGenerator = (theme) => (
   StyleSheet.create({
     wrapper: {
@@ -215,9 +221,6 @@ const MenuStylesGenerator = (theme) => (
       display: "flex",
       justifyContent: "center",
       alignItems: "center",
-    },
-    fullMenu: {
-      flex: 1,
     },
     heading: {
       fontSize: 18,

@@ -75,8 +75,8 @@ export default () => {
         <DataList
           style={{ marginTop: 10 }}
           data={[
-            { label: 'Set', value: '08/03 12:36 PM' },
-            { label: 'Rise', value: '08/03 04:22 AM' },
+            { label: 'Set', value: moon.set ? moon.set.formatted : '-' },
+            { label: 'Rise', value: moon.rise ? moon.rise.formatted : '-' },
             { label: 'Distance', value: moon.current.distance.formatted },
             {
               label: 'Ping to moon',

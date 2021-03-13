@@ -71,6 +71,7 @@ const stylesGenerator = (theme) => (
     },
     label: {
       color: theme.colors.colorFontDark,
+      fontFamily: "Orbitron-Regular",
       marginBottom: 5,
     },
     TextInput: {
@@ -79,6 +80,7 @@ const stylesGenerator = (theme) => (
       paddingVertical: 5,
       borderRadius: 3,
       color: theme.colors.colorFontMain,
+      fontFamily: "Orbitron-Regular",
       backgroundColor: theme.colors.colorBgUserCoordsInput,
     },
     button: {
