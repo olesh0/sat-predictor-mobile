@@ -71,7 +71,7 @@ export default () => {
       <TextInput
         style={styles.searchTextInput}
         keyboardAppearance="dark"
-        keyboardType="number-pad"
+        keyboardType="default"
         onChangeText={(term) => setSearch(term)}
         value={search}
         placeholder="Search satellite"

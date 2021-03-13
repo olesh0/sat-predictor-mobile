@@ -1,7 +1,6 @@
 import React from 'react'
 import { View, FlatList } from 'react-native'
 import { useGetter } from 'vuex-react'
-import _ from 'lodash'
 
 import SatellitePass from '../components/SatellitePass'
 
