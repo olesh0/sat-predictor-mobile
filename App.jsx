@@ -1,8 +1,13 @@
 import React from 'react';
-import { StyleSheet, SafeAreaView } from 'react-native';
 import * as Font from 'expo-font';
 
-import { NavigationProvider, Routes } from './context/Routes'
+import { Provider as StoreProvider } from 'vuex-react'
+
+import store from './store'
+
+import Navigation from './Navigation'
+import ThemeProvider from './context/Theme'
+import LoaderProvider from './context/Loader'
 
 console.disableYellowBox = true;
 
@@ -17,17 +22,12 @@ export default function App() {
   console.log({ isFontsLoaded: Font.isLoaded('Orbitron-Black') }, error)
 
   return (
-    <NavigationProvider>
-      <SafeAreaView style={styles.container}>
-        {fontsLoaded && <Routes />}
-      </SafeAreaView>
-    </NavigationProvider>
+    <StoreProvider store={store}>
+      <ThemeProvider>
+        <LoaderProvider>
+          {fontsLoaded && <Navigation />}
+        </LoaderProvider>
+      </ThemeProvider>
+    </StoreProvider>
   );
 }
-
-const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-    backgroundColor: "#17191A",
-  },
-});
