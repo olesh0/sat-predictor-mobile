@@ -1,5 +1,6 @@
 import React, { useEffect, useState } from 'react'
 import { Text, View, FlatList, TouchableOpacity, StyleSheet, TextInput } from 'react-native'
+import { useNetInfo } from '@react-native-community/netinfo'
 import { useGetter, useStore } from 'vuex-react'
 import { useDebounce } from 'use-debounce'
 import _ from 'lodash'
@@ -10,6 +11,8 @@ import Loader from '../components/Loader'
 import { useTheme } from '../context/Theme'
 import { useSatelliteLocation } from '../hooks'
 import { getElevationString } from '../utils'
+
+const MAX_SAT_NAME_LENGTH = 10
 
 const PassInProgress = ({ elevation }) => {
   const { theme } = useTheme()
@@ -51,6 +54,9 @@ const PassInProgress = ({ elevation }) => {
 }
 
 export default () => {
+  const netInfo = useNetInfo()
+
+  const [satInfos, setSatInfos] = useState([])
   const [search, setSearch] = useState('')
   const [searchDebounced] = useDebounce(search, 1000);
 
@@ -64,10 +70,44 @@ export default () => {
 
   useEffect(() => {
     dispatch('satellites/fetchSats', { search: searchDebounced })
-  }, [searchDebounced])
+  }, [searchDebounced, netInfo.isInternetReachable])
+
+  useEffect(() => {
+    const evaluateSatsInfos = () => {
+      try {
+        const infos = satellites.member && satellites.member.map(({ name, line1, line2 }) => useSatelliteLocation({ name, line1, line2 }))
+
+        if (!infos) return
+
+        setSatInfos([...infos])
+      } catch (e) {
+        console.error(e)
+      }
+    }
+
+    const satsInfoUpdateInterval = setInterval(evaluateSatsInfos, 1000)
+
+    evaluateSatsInfos()
+
+    return () => clearInterval(satsInfoUpdateInterval)
+  }, [satellites])
+
+  if (netInfo.isInternetReachable === false || netInfo.isConnected === false) {
+    return (
+      <View style={styles.content}>
+        <Text style={styles.noInternetPrimary}>
+          Cannot fetch satellites list
+        </Text>
+
+        <Text style={styles.noInternetSecondary}>
+          This section requires internet connection...
+        </Text>
+      </View>
+    )
+  }
 
   return (
-    <View style={{ padding: 20, paddingTop: 10 }}>
+    <View style={styles.content}>
       <TextInput
         style={styles.searchTextInput}
         keyboardAppearance="dark"
@@ -80,19 +120,17 @@ export default () => {
 
       <FlatList
         keyExtractor={(_, index) => `pass-${index}`}
-        data={satellites.member}
+        data={(satellites.member || []).map((satellite, satIndex) => ({
+          satellite,
+          location: satInfos[satIndex],
+        }))}
         numColumns={1}
-        renderItem={({ item, index }) => {
-          const satInfo = useSatelliteLocation({
-            name: item.name,
-            line1: item.line1,
-            line2: item.line2,
-          })
-          const elevation = getElevationString(satInfo.elevation.raw)
+        renderItem={({ item: { satellite, location = {} } }) => {
+          const elevation = getElevationString(location.elevation && location.elevation.raw || 0)
 
           return (
             <TouchableOpacity
-              onPress={() => changeScreen('__SATELLITE__', item)}
+              onPress={() => changeScreen('__SATELLITE__', satellite)}
               style={[
                 {
                   borderLeftWidth: 5,
@@ -110,9 +148,13 @@ export default () => {
                       fontSize: 25,
                       color: theme.colors.colorFontMain,
                     }}
-                  >{item.name}</Text>
+                  >
+                    {satellite.name.length > MAX_SAT_NAME_LENGTH
+                      ? `${satellite.name.substring(0, MAX_SAT_NAME_LENGTH).trim()}...`
+                      : satellite.name}
+                  </Text>
 
-                  {satInfo.elevation.raw > 0 && (
+                  {location.elevation && location.elevation.raw > 0 && (
                     <PassInProgress elevation={elevation} />
                   )}
                 </View>
@@ -123,7 +165,7 @@ export default () => {
                     color: theme.colors.colorFontMain,
                     fontFamily: "Orbitron-Regular",
                   }}
-                >Elev. {satInfo.elevation.formatted}</Text>
+                >Elev. {location.elevation?.formatted ?? "-"}</Text>
               </View>
             </TouchableOpacity>
           )
@@ -135,6 +177,22 @@ export default () => {
 
 const stylesGenerator = (theme) => (
   StyleSheet.create({
+    content: {
+      padding: 20,
+      paddingTop: 10,
+    },
+    noInternetPrimary: {
+      color: theme.colors.colorAccentRed,
+      fontSize: 25,
+      fontFamily: "Orbitron-Bold",
+      marginTop: 10,
+      marginBottom: 5,
+    },
+    noInternetSecondary: {
+      color: theme.colors.colorAccentRed,
+      fontSize: 17,
+      fontFamily: "Orbitron-Regular",
+    },
     searchTextInput: {
       fontSize: 17,
       fontFamily: "Orbitron-Regular",
