@@ -27,6 +27,8 @@ export default ({ params, meta }) => {
   const [futurePasses, setFuturePasses] = useState([])
   const [satellite = {}, setSatellite] = useGetter('satellites/satellite')
 
+  const satelliteName = useMemo(() => params.name || tleInfo.name, [params, tleInfo])
+
   const getSatInfo = useCallback((tle) => {
     const satInfo = useSatelliteLocation(tle || tleInfo)
 
@@ -48,13 +50,14 @@ export default ({ params, meta }) => {
         noradId: meta.satelliteNoradId,
       })
     } else if (!tleInfo.name) {
-      setTleInfo({
+      const tle = {
         name: params.name,
         line1: params.line1,
         line2: params.line2,
-      })
+      }
 
-      getSatInfo()
+      setTleInfo(tle)
+      getSatInfo(tle)
     }
 
     return () => clearInterval(interval)
@@ -84,7 +87,7 @@ export default ({ params, meta }) => {
       }}
     >
       <View style={styles.content}>
-        <Text style={styles.satName}>{params.name}</Text>
+        <Text style={styles.satName}>{satelliteName}</Text>
 
         <DataList data={dataList} />
 
@@ -106,7 +109,7 @@ export default ({ params, meta }) => {
                   onPress={() => changeScreen('__PASS__', {
                     pass: item,
                     satellite: {
-                      name: params.name || tleInfo.name,
+                      name: satelliteName,
                     },
                   })}
                   style={[
