@@ -11,5 +11,11 @@ export const useSatelliteFuturePasses = ({ name, line1, line2 }) => {
 
   const windowStart = new Date()
 
-  return jspredict.transits(tle, qth, windowStart.getTime() - 600, windowStart.getTime() + PASSES_WINDOW_LENGTH * 1000)
+  return jspredict.transits(
+    tle,
+    qth,
+    windowStart.getTime() - 600,
+    windowStart.getTime() + PASSES_WINDOW_LENGTH * 1000,
+    5,
+  )
 }

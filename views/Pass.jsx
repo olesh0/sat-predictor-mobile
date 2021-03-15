@@ -50,15 +50,10 @@ export default ({ params }) => {
         const startTime = new Date(start)
         const endTime = new Date(end)
 
-        console.log(startTime, endTime)
-
         const duration = (endTime - startTime)
         const timePassed = new Date() - startTime
 
-        const passPercents = (timePassed / duration) * 100
-
-        console.log(passPercents)
-        setPercents(passPercents)
+        setPercents((timePassed / duration) * 100)
       } catch (e) {
         console.error(e)
       }

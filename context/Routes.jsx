@@ -34,10 +34,19 @@ const menuItems = [
     title: () => 'Satellites list',
     component: lazy(() => import('../views/Satellites')),
   },
+  // Commented until the best times
+  // {
+  //   name: '__PASSES__',
+  //   title: () => 'Upcoming passes overhead',
+  //   component: lazy(() => import('../views/Passes')),
+  // },
   {
-    name: '__PASSES__',
-    title: () => 'Upcoming passes overhead',
-    component: lazy(() => import('../views/Passes')),
+    name: '__ISS__',
+    title: () => 'ISS',
+    component: lazy(() => import('../views/Satellite')),
+    meta: {
+      satelliteNoradId: 25544,
+    },
   },
   {
     name: '__SUN_AND_MOON__',
@@ -68,6 +77,7 @@ export const NavigationProvider = ({ children }) => {
 
   const [currentScreen, setCurrentScreen] = React.useState(null)
   const [paramsToPass, setParamsToPass] = React.useState(null)
+  const [metaData, setMetaData] = React.useState(null)
 
   const changeScreen = async (screenName, params = {}) => {
     const screen = screens.find(({ name }) => screenName === name)
@@ -75,6 +85,7 @@ export const NavigationProvider = ({ children }) => {
     if (!screen) return
 
     setParamsToPass(params)
+    setMetaData(screen.meta)
     setCurrentScreen(screen)
   }
 
@@ -88,6 +99,7 @@ export const NavigationProvider = ({ children }) => {
         currentScreen,
         paramsToPass,
         screens,
+        meta: metaData,
         changeScreen,
       }}
     >
@@ -105,6 +117,7 @@ export const Routes = () => {
   const {
     currentScreen: CurrentScreen,
     paramsToPass = {},
+    meta: metaData = {},
     screens,
     changeScreen,
   } = useNavigation()
@@ -124,7 +137,12 @@ export const Routes = () => {
           {
             CurrentScreen
             && CurrentScreen.component
-            && <CurrentScreen.component params={paramsToPass} />
+            && (
+              <CurrentScreen.component
+                params={paramsToPass}
+                meta={metaData}
+              />
+            )
           }
         </ScrollView>
 

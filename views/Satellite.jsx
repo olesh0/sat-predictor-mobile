@@ -7,14 +7,17 @@ import DataList from '../components/DataList'
 import { useTheme } from '../context/Theme'
 import { useNavigation } from '../context/Routes'
 import { useSatelliteLocation, useSatelliteFuturePasses } from '../hooks'
+import { useSatelliteTle } from '../hooks'
 import { getElevationString } from '../utils'
 
-export default ({ params }) => {
-  const tleInfo = {
-    name: params.name,
-    line1: params.line1,
-    line2: params.line2,
-  }
+const INTERVAL_TIME = 1000
+
+export default ({ params, meta }) => {
+  const [tleInfo, setTleInfo] = useState({
+    name: null,
+    line1: null,
+    line2: null,
+  })
 
   const { changeScreen } = useNavigation()
 
@@ -24,26 +27,43 @@ export default ({ params }) => {
   const [futurePasses, setFuturePasses] = useState([])
   const [satellite = {}, setSatellite] = useGetter('satellites/satellite')
 
-  const getSatInfo = useCallback(() => {
-    const satInfo = useSatelliteLocation(tleInfo)
+  const getSatInfo = useCallback((tle) => {
+    const satInfo = useSatelliteLocation(tle || tleInfo)
 
     setSatellite(satInfo)
   }, [tleInfo, useSatelliteLocation])
 
   useEffect(() => {
-    const interval = setInterval(getSatInfo, 2500)
-
-    getSatInfo()
+    const interval = setInterval(getSatInfo, INTERVAL_TIME)
 
     const passes = useSatelliteFuturePasses(tleInfo)
     setFuturePasses(passes)
 
+    if (meta.satelliteNoradId && !tleInfo.name) {
+      useSatelliteTle({
+        onFetch: (tleInfo) => {
+          setTleInfo(tleInfo)
+          getSatInfo(tleInfo)
+        },
+        noradId: meta.satelliteNoradId,
+      })
+    } else if (!tleInfo.name) {
+      setTleInfo({
+        name: params.name,
+        line1: params.line1,
+        line2: params.line2,
+      })
+
+      getSatInfo()
+    }
+
     return () => clearInterval(interval)
-  }, [])
+  }, [tleInfo])
 
   const dataList = useMemo(() => {
     try {
       return [
+        { label: 'NORAD ID', value: params.satelliteId || meta.satelliteNoradId },
         { label: 'Current elevation', value: satellite.elevation.formatted },
         { label: 'Distance', value: satellite.rangeSat.formatted },
         { label: 'Latitude', value: satellite.latitude.formatted },
@@ -85,7 +105,9 @@ export default ({ params }) => {
                 <TouchableOpacity
                   onPress={() => changeScreen('__PASS__', {
                     pass: item,
-                    satellite: params,
+                    satellite: {
+                      name: params.name || tleInfo.name,
+                    },
                   })}
                   style={[
                     styles.pass,
@@ -97,7 +119,7 @@ export default ({ params }) => {
                   </Text>
 
                   <Text style={styles.passTime}>
-                    {moment(item.start).format("HH:mm:ss")} - {moment(item.end).format("HH:mm:ss")}
+                    {moment(item.start).format("hh:mm:ss A")} - {moment(item.end).format("HH:mm:ss A")}
                   </Text>
                 </TouchableOpacity>
               )
