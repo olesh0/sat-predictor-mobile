@@ -7,19 +7,21 @@ export const useSatelliteTle = async ({ noradId, onFetch }) => {
   const STORAGE_KEY = CACHED_SAT_KEY_PREFIX + noradId
   const cachedTle = await AsyncStorage.getItem(STORAGE_KEY)
 
-  const fetchTleFromServer = () => {
-    return axios.get(`/api/tle/${noradId}`).then(async ({ data, status }) => {
-      if (status >= 200 && status < 300) {
-        const tleData = {
-          name: data.name,
-          line1: data.line1,
-          line2: data.line2,
-        }
+  const fetchTleFromServer = async () => {
+    const { data, status } = axios.get(`/api/tle/${noradId}`)
 
-        await AsyncStorage.setItem(STORAGE_KEY, JSON.stringify(tleData))
-        onFetch(tleData)
+    if (status >= 200 && status < 300) {
+      const tleData = {
+        name: data.name,
+        line1: data.line1,
+        line2: data.line2,
       }
-    })
+
+      await AsyncStorage.setItem(STORAGE_KEY, JSON.stringify(tleData))
+      onFetch(tleData)
+
+      return Promise.resolve(tleData)
+    }
   }
 
   if (cachedTle) {
@@ -30,10 +32,17 @@ export const useSatelliteTle = async ({ noradId, onFetch }) => {
         throw 'Cached TLE is invalid'
       }
 
-      return onFetch(parsedTle)
+      onFetch && onFetch(parsedTle)
+
+      return Promise.resolve(parsedTle)
     } catch (e) {
       console.error(e)
-      fetchTleFromServer()
+      const tleData = await fetchTleFromServer()
+
+      return Promise.resolve(tleData)
     }
-  } else fetchTleFromServer()
+  } else {
+    const data = await fetchTleFromServer()
+    return Promise.resolve(data)
+  }
 }

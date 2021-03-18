@@ -9,6 +9,7 @@ import { useNavigation } from '../context/Routes'
 import { useSatelliteLocation, useSatelliteFuturePasses } from '../hooks'
 import { useSatelliteTle } from '../hooks'
 import { getElevationString } from '../utils'
+import { useStoredValue } from '../hooks/useStoredValue'
 
 const INTERVAL_TIME = 1000
 
@@ -42,12 +43,20 @@ export default ({ params, meta }) => {
     setFuturePasses(passes)
 
     if (meta.satelliteNoradId && !tleInfo.name) {
-      useSatelliteTle({
-        onFetch: (tleInfo) => {
+      // in a case of in-menu satellite usage we cache the tle for sometime
+      useStoredValue({
+        key: `SAT_STORED_VALUE_${meta.satelliteNoradId}`,
+        evaluationHandler: async () => {
+          const data = await useSatelliteTle({
+            noradId: meta.satelliteNoradId,
+          })
+
+          return Promise.resolve(data)
+        },
+        onEvaluated: ({ value: tleInfo }) => {
           setTleInfo(tleInfo)
           getSatInfo(tleInfo)
         },
-        noradId: meta.satelliteNoradId,
       })
     } else if (!tleInfo.name) {
       const tle = {
@@ -111,6 +120,7 @@ export default ({ params, meta }) => {
                     satellite: {
                       name: satelliteName,
                     },
+                    goBackParams: params,
                   })}
                   style={[
                     styles.pass,
