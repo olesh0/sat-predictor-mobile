@@ -1,14 +1,16 @@
 import React, { useEffect, useMemo, useState } from 'react'
-import { Text, View, StyleSheet } from 'react-native'
+import { Text, View, StyleSheet, TouchableOpacity } from 'react-native'
 import { useGetter } from 'vuex-react'
 import moment from 'moment'
 
 import DataList from '../components/DataList'
 import Loader from '../components/Loader'
+import { useNavigation } from '../context/Routes'
 import { useTheme } from '../context/Theme'
 import { useSatelliteLocation } from '../hooks'
 
 export default ({ params }) => {
+  const { goBackParams } = params
   const tleInfo = {
     name: params.satellite.name,
     line1: params.satellite.line1,
@@ -16,6 +18,7 @@ export default ({ params }) => {
   }
 
   const { theme } = useTheme()
+  const { changeScreen } = useNavigation()
   const styles = useMemo(() => stylesGenerator(theme), [theme])
 
   const [satellite = {}, setSatellite] = useGetter('satellites/satellite')
@@ -118,12 +121,33 @@ export default ({ params }) => {
           ]}></View>
         </View>
       </View>
+
+      <TouchableOpacity
+        style={styles.goBackButton}
+        onPress={() => changeScreen('__SATELLITE__', goBackParams)}
+      >
+        <Text style={styles.goBackButtonText}>
+          Go back to satellite - {params.satellite.name}
+        </Text>
+      </TouchableOpacity>
     </View>
   )
 }
 
 const stylesGenerator = (theme) => (
   StyleSheet.create({
+    goBackButtonText: {
+      color: theme.colors.colorAccentGreen,
+      fontFamily: "Orbitron-Regular",
+      textAlign: "center",
+    },
+    goBackButton: {
+      marginTop: 10,
+      paddingVertical: 15,
+      paddingHorizontal: 10,
+      borderRadius: 7,
+      backgroundColor: theme.colors.colorBgLight,
+    },
     satName: {
       marginTop: 10,
       fontSize: 25,
