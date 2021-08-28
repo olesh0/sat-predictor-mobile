@@ -12,6 +12,7 @@ import { useSatelliteLocation, useSatelliteFuturePasses } from '../hooks'
 import { useSatelliteTle } from '../hooks'
 import { getElevationString } from '../utils'
 import { useStoredValue } from '../hooks/useStoredValue'
+import { getLocation } from '../utils/location'
 
 const INTERVAL_TIME = 1000
 
@@ -32,8 +33,15 @@ export default ({ params, meta }) => {
 
   const satelliteName = useMemo(() => _.get(params, 'name') || _.get(tleInfo, 'name'), [params, tleInfo])
 
-  const getSatInfo = useCallback((tle) => {
-    const satInfo = useSatelliteLocation(tle || tleInfo)
+  const getSatInfo = useCallback(async (tle) => {
+    console.log('123')
+
+    const location = await getLocation()
+
+    const satInfo = useSatelliteLocation({
+      ...(tle || tleInfo),
+      ...location,
+    })
 
     setSatellite(satInfo)
   }, [tleInfo, useSatelliteLocation])
@@ -41,12 +49,23 @@ export default ({ params, meta }) => {
   useEffect(() => {
     const interval = setInterval(getSatInfo, INTERVAL_TIME)
 
-    const passes = useSatelliteFuturePasses(tleInfo || {})
-    setFuturePasses(passes)
+    const evaluateFuturePasses = async () => {
+      const location = await getLocation()
+      const passes = await useSatelliteFuturePasses({
+        ...(tleInfo || {}),
+        ...location,
+      })
+
+      console.log({ location, passes })
+
+      setFuturePasses(passes)
+    }
+
+    if (tleInfo.name) {
+      evaluateFuturePasses()
+    }
 
     const tleInfoName = _.get(tleInfo, 'name')
-
-    console.log({ tleInfo })
 
     if (meta.satelliteNoradId && !tleInfo.name) {
       // in a case of in-menu satellite usage we cache the tle for sometime
@@ -60,8 +79,6 @@ export default ({ params, meta }) => {
           return Promise.resolve(data)
         },
         onEvaluated: (tleInfo) => {
-          console.log({ev: tleInfo})
-
           setTleInfo(tleInfo)
           getSatInfo(tleInfo)
         },

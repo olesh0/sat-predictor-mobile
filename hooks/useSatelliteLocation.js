@@ -1,5 +1,4 @@
 import jspredict from 'jspredict'
-import { useUserLocation } from './useUserLocation'
 
 export const formatLocation = (location) => {
   return {
@@ -8,9 +7,8 @@ export const formatLocation = (location) => {
   }
 }
 
-export const useSatelliteLocation = ({ name, line1, line2 }) => {
-  const { lat, lon } = useUserLocation()
-  const satInfo = jspredict.observe(`${name}\n${line1}\n${line2}`, [lat, lon, 0.1])
+export const useSatelliteLocation = ({ name, line1, line2, latitude, longitude }) => {
+  const satInfo = jspredict.observe(`${name}\n${line1}\n${line2}`, [latitude, longitude, 0.1])
 
   if (!satInfo) {
     return {

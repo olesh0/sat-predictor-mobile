@@ -17,9 +17,9 @@ export default () => {
   const [sun, setSun] = useState(null)
   const [moon, setMoon] = useState(null)
 
-  const calculateData = () => {
-    setSun(useSunData())
-    setMoon(useMoonData())
+  const calculateData = async () => {
+    setSun(await useSunData())
+    setMoon(await useMoonData())
   }
 
   useEffect(() => {

@@ -1,9 +1,10 @@
-import React, { useEffect, useState } from 'react'
+import React, { useState } from 'react'
 import { View, StyleSheet, Text, Alert, TouchableOpacity } from 'react-native'
 import _ from 'lodash'
 
 import { useStoredValue } from '../hooks/useStoredValue'
 import { useTheme } from '../context/Theme'
+import { getLocation } from '../utils/location'
 
 export default () => {
   const { theme } = useTheme()
@@ -12,21 +13,6 @@ export default () => {
   const [latitude, setLatitude] = useState(0)
   const [longitude, setLongitude] = useState(0)
   const [disableButtons, setDisableButtons] = useState(false)
-
-  const getLocation = ({ onLocationReceive }) => {
-    navigator.geolocation.getCurrentPosition((location) => {
-      const latitude = _.get(location, 'coords.latitude')
-      const longitude = _.get(location, 'coords.longitude')
-
-      onLocationReceive({ latitude, longitude })
-    }, () => {
-      onLocationReceive({ latitude: 0, longitude: 0 })
-      Alert.alert('No luck evaluating your coords...')
-    }, {
-      timeout: 10000,
-      enableHighAccuracy: false,
-    })
-  }
 
   const evaluateLocation = () => {
     setDisableButtons(true)

@@ -1,13 +1,13 @@
 import jspredict from 'jspredict'
-import { useUserLocation } from './useUserLocation'
+import { getLocation } from '../utils/location'
 
 const PASSES_WINDOW_LENGTH = 86400 * 3 // 3 days
 
-export const useSatelliteFuturePasses = ({ name, line1, line2 }) => {
-  const userLocation = useUserLocation()
+export const useSatelliteFuturePasses = async ({ name, line1, line2 }) => {
+  const userLocation = await getLocation()
 
   const tle = `${name}\n${line1}\n${line2}`
-  const qth = [userLocation.lat, userLocation.lon, 0.1]
+  const qth = [userLocation.latitude, userLocation.longitude, 0.1]
 
   const windowStart = new Date()
 
