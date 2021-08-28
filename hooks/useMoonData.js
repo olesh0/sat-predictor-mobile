@@ -1,17 +1,17 @@
 import SunCalc from 'suncalc'
 
-import { useUserLocation } from './useUserLocation'
+import { getLocation } from '../utils/location'
 import { formatTime, radiansToDegress } from './useSunData'
 
 export const normalizeNumber = (number) => {
   return number.toString().replace(/\B(?=(\d{3})+(?!\d))/g, " ")
 }
 
-export const useMoonData = () => {
-  const { lat, lon } = useUserLocation()
+export const useMoonData = async () => {
+  const { latitude, longitude } = await getLocation()
 
-  const times = SunCalc.getMoonTimes(new Date(), lat, lon)
-  const current = SunCalc.getMoonPosition(new Date(), lat, lon)
+  const times = SunCalc.getMoonTimes(new Date(), latitude, longitude)
+  const current = SunCalc.getMoonPosition(new Date(), latitude, longitude)
 
   const results = {
     current: {

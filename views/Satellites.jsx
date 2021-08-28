@@ -10,6 +10,7 @@ import { useNavigation } from '../context/Routes'
 import Loader from '../components/Loader'
 import { useTheme } from '../context/Theme'
 import { useSatelliteLocation } from '../hooks'
+import { getLocation } from '../utils/location'
 import { getElevationString } from '../utils'
 
 const MAX_SAT_NAME_LENGTH = 10
@@ -73,9 +74,10 @@ export default () => {
   }, [searchDebounced, netInfo.isInternetReachable])
 
   useEffect(() => {
-    const evaluateSatsInfos = () => {
+    const evaluateSatsInfos = async () => {
       try {
-        const infos = satellites.member && satellites.member.map(({ name, line1, line2 }) => useSatelliteLocation({ name, line1, line2 }))
+        const { latitude, longitude } = await getLocation()
+        const infos = satellites.member && satellites.member.map(({ name, line1, line2 }) => useSatelliteLocation({ name, line1, line2, latitude, longitude }))
 
         if (!infos) return
 

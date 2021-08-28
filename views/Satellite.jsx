@@ -2,6 +2,7 @@ import React, { useCallback, useEffect, useMemo, useState } from 'react'
 import { Text, View, StyleSheet, FlatList, TouchableOpacity } from 'react-native'
 import { useGetter } from 'vuex-react'
 import moment from 'moment'
+import formatCoords from 'formatcoords'
 import _ from 'lodash'
 
 import DataList from '../components/DataList'
@@ -11,6 +12,7 @@ import { useSatelliteLocation, useSatelliteFuturePasses } from '../hooks'
 import { useSatelliteTle } from '../hooks'
 import { getElevationString } from '../utils'
 import { useStoredValue } from '../hooks/useStoredValue'
+import { getLocation } from '../utils/location'
 
 const INTERVAL_TIME = 1000
 
@@ -31,8 +33,15 @@ export default ({ params, meta }) => {
 
   const satelliteName = useMemo(() => _.get(params, 'name') || _.get(tleInfo, 'name'), [params, tleInfo])
 
-  const getSatInfo = useCallback((tle) => {
-    const satInfo = useSatelliteLocation(tle || tleInfo)
+  const getSatInfo = useCallback(async (tle) => {
+    console.log('123')
+
+    const location = await getLocation()
+
+    const satInfo = useSatelliteLocation({
+      ...(tle || tleInfo),
+      ...location,
+    })
 
     setSatellite(satInfo)
   }, [tleInfo, useSatelliteLocation])
@@ -40,12 +49,25 @@ export default ({ params, meta }) => {
   useEffect(() => {
     const interval = setInterval(getSatInfo, INTERVAL_TIME)
 
-    const passes = useSatelliteFuturePasses(tleInfo || {})
-    setFuturePasses(passes)
+    const evaluateFuturePasses = async () => {
+      const location = await getLocation()
+      const passes = await useSatelliteFuturePasses({
+        ...(tleInfo || {}),
+        ...location,
+      })
+
+      console.log({ location, passes })
+
+      setFuturePasses(passes)
+    }
+
+    if (tleInfo.name) {
+      evaluateFuturePasses()
+    }
 
     const tleInfoName = _.get(tleInfo, 'name')
 
-    if (meta.satelliteNoradId && !tleInfoName) {
+    if (meta.satelliteNoradId && !tleInfo.name) {
       // in a case of in-menu satellite usage we cache the tle for sometime
       useStoredValue({
         key: `SAT_STORED_VALUE_${meta.satelliteNoradId}`,
@@ -56,7 +78,7 @@ export default ({ params, meta }) => {
 
           return Promise.resolve(data)
         },
-        onEvaluated: ({ value: tleInfo }) => {
+        onEvaluated: (tleInfo) => {
           setTleInfo(tleInfo)
           getSatInfo(tleInfo)
         },
@@ -77,12 +99,22 @@ export default ({ params, meta }) => {
 
   const dataList = useMemo(() => {
     try {
+      const formattedCoords = formatCoords({
+        lat: satellite.latitude.raw,
+        lng: satellite.longitude.raw,
+      }).format({
+        latLonSeparator: '|',
+        decimalPlaces: 1,
+      })
+
+      const [latitude, longitude] = formattedCoords.split('|')
+
       return [
         { label: 'NORAD ID', value: params.satelliteId || meta.satelliteNoradId },
         { label: 'Current elevation', value: satellite.elevation.formatted },
         { label: 'Distance', value: satellite.rangeSat.formatted },
-        { label: 'Latitude', value: satellite.latitude.formatted },
-        { label: 'Longitude', value: satellite.longitude.formatted },
+        { label: 'Latitude', value: latitude },
+        { label: 'Longitude', value: longitude },
         { label: 'Altitude', value: satellite.altitude.formatted },
       ]
     } catch (e) {
@@ -122,8 +154,14 @@ export default ({ params, meta }) => {
                     pass: item,
                     satellite: {
                       name: satelliteName,
+                      line1: tleInfo.line1,
+                      line2: tleInfo.line2
                     },
-                    goBackParams: params,
+                    goBackParams: {
+                      name: satelliteName,
+                      line1: tleInfo.line1,
+                      line2: tleInfo.line2
+                    },
                   })}
                   style={[
                     styles.pass,

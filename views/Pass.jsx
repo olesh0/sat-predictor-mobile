@@ -8,6 +8,7 @@ import Loader from '../components/Loader'
 import { useNavigation } from '../context/Routes'
 import { useTheme } from '../context/Theme'
 import { useSatelliteLocation } from '../hooks'
+import { getLocation } from '../utils/location'
 
 export default ({ params }) => {
   const { goBackParams } = params
@@ -24,8 +25,12 @@ export default ({ params }) => {
   const [satellite = {}, setSatellite] = useGetter('satellites/satellite')
 
   useEffect(() => {
-    const getSatInfo = () => {
-      const satInfo = useSatelliteLocation(tleInfo)
+    const getSatInfo = async () => {
+      const location = getLocation()
+      const satInfo = useSatelliteLocation({
+        ...tleInfo,
+        ...location,
+      })
 
       setSatellite(satInfo)
     }
