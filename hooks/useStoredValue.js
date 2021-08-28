@@ -21,21 +21,21 @@ export const useStoredValue = async ({ key, evaluationHandler, onEvaluated }) =>
 
     try {
       const parsedStoredKey = JSON.parse(storedKey)
-      onEvaluated && onEvaluated(itemValue)
+      onEvaluated && onEvaluated(parsedStoredKey.value)
 
       return Promise.resolve(parsedStoredKey)
     } catch (e) {
       const itemValue = await fetchValue()
-      onEvaluated && onEvaluated(itemValue)
+      onEvaluated && onEvaluated(itemValue.value)
 
-      return Promise.resolve(itemValue)
+      return Promise.resolve(itemValue.value)
     }
   } else {
     console.log('storing value...', key)
 
     const itemValue = await fetchValue()
-    onEvaluated && onEvaluated(itemValue)
+    onEvaluated && onEvaluated(itemValue.value)
 
-    return Promise.resolve(itemValue)
+    return Promise.resolve(itemValue.value)
   }
 }

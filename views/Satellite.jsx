@@ -46,7 +46,9 @@ export default ({ params, meta }) => {
 
     const tleInfoName = _.get(tleInfo, 'name')
 
-    if (meta.satelliteNoradId && !tleInfoName) {
+    console.log({ tleInfo })
+
+    if (meta.satelliteNoradId && !tleInfo.name) {
       // in a case of in-menu satellite usage we cache the tle for sometime
       useStoredValue({
         key: `SAT_STORED_VALUE_${meta.satelliteNoradId}`,
@@ -57,7 +59,9 @@ export default ({ params, meta }) => {
 
           return Promise.resolve(data)
         },
-        onEvaluated: ({ value: tleInfo }) => {
+        onEvaluated: (tleInfo) => {
+          console.log({ev: tleInfo})
+
           setTleInfo(tleInfo)
           getSatInfo(tleInfo)
         },
