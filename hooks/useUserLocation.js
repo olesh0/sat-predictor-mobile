@@ -1,6 +1,6 @@
 export const useUserLocation = () => {
   return {
-    lat: 48.525595,
-    lon: 25.035057,
+    lat: 48.521961,
+    lon: 25.036918,
   }
 }
