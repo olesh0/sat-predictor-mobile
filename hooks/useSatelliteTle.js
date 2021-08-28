@@ -4,11 +4,11 @@ import axios from '../utils/axios'
 const CACHED_SAT_KEY_PREFIX = 'SAT_'
 
 export const useSatelliteTle = async ({ noradId, onFetch }) => {
-  const STORAGE_KEY = CACHED_SAT_KEY_PREFIX + noradId
+  const STORAGE_KEY = `${CACHED_SAT_KEY_PREFIX}${noradId}`
   const cachedTle = await AsyncStorage.getItem(STORAGE_KEY)
 
   const fetchTleFromServer = async () => {
-    const { data, status } = axios.get(`/api/tle/${noradId}`)
+    const { data, status } = await axios.get(`/api/tle/${noradId}`)
 
     if (status >= 200 && status < 300) {
       const tleData = {
@@ -18,7 +18,7 @@ export const useSatelliteTle = async ({ noradId, onFetch }) => {
       }
 
       await AsyncStorage.setItem(STORAGE_KEY, JSON.stringify(tleData))
-      onFetch(tleData)
+      onFetch && onFetch(tleData)
 
       return Promise.resolve(tleData)
     }
@@ -43,6 +43,7 @@ export const useSatelliteTle = async ({ noradId, onFetch }) => {
     }
   } else {
     const data = await fetchTleFromServer()
+
     return Promise.resolve(data)
   }
 }

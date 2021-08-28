@@ -2,6 +2,7 @@ import React, { useCallback, useEffect, useMemo, useState } from 'react'
 import { Text, View, StyleSheet, FlatList, TouchableOpacity } from 'react-native'
 import { useGetter } from 'vuex-react'
 import moment from 'moment'
+import _ from 'lodash'
 
 import DataList from '../components/DataList'
 import { useTheme } from '../context/Theme'
@@ -28,7 +29,7 @@ export default ({ params, meta }) => {
   const [futurePasses, setFuturePasses] = useState([])
   const [satellite = {}, setSatellite] = useGetter('satellites/satellite')
 
-  const satelliteName = useMemo(() => params.name || tleInfo.name, [params, tleInfo])
+  const satelliteName = useMemo(() => _.get(params, 'name') || _.get(tleInfo, 'name'), [params, tleInfo])
 
   const getSatInfo = useCallback((tle) => {
     const satInfo = useSatelliteLocation(tle || tleInfo)
@@ -39,10 +40,12 @@ export default ({ params, meta }) => {
   useEffect(() => {
     const interval = setInterval(getSatInfo, INTERVAL_TIME)
 
-    const passes = useSatelliteFuturePasses(tleInfo)
+    const passes = useSatelliteFuturePasses(tleInfo || {})
     setFuturePasses(passes)
 
-    if (meta.satelliteNoradId && !tleInfo.name) {
+    const tleInfoName = _.get(tleInfo, 'name')
+
+    if (meta.satelliteNoradId && !tleInfoName) {
       // in a case of in-menu satellite usage we cache the tle for sometime
       useStoredValue({
         key: `SAT_STORED_VALUE_${meta.satelliteNoradId}`,
@@ -58,7 +61,7 @@ export default ({ params, meta }) => {
           getSatInfo(tleInfo)
         },
       })
-    } else if (!tleInfo.name) {
+    } else if (!tleInfoName) {
       const tle = {
         name: params.name,
         line1: params.line1,
