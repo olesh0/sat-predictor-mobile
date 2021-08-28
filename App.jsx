@@ -8,6 +8,7 @@ import store from './store'
 import Navigation from './Navigation'
 import ThemeProvider from './context/Theme'
 import LoaderProvider from './context/Loader'
+import { LocationProvider } from './context/LocationProvider';
 
 console.disableYellowBox = true;
 
@@ -19,13 +20,15 @@ export default function App() {
     'Orbitron-Regular': require('./assets/orbitron/Orbitron-Regular.ttf'),
   })
 
-  console.log({ isFontsLoaded: Font.isLoaded('Orbitron-Black') }, error)
+  console.log({ areFontsLoaded: Font.isLoaded('Orbitron-Black') }, error)
 
   return (
     <StoreProvider store={store}>
       <ThemeProvider>
         <LoaderProvider>
-          {fontsLoaded && <Navigation />}
+          <LocationProvider>
+            {fontsLoaded && <Navigation />}
+          </LocationProvider>
         </LoaderProvider>
       </ThemeProvider>
     </StoreProvider>

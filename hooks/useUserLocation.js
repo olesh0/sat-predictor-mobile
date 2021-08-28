@@ -4,7 +4,7 @@ import { useStoredValue } from '../hooks/useStoredValue'
 
 export const useUserLocation = () => {
   const [latitude, setLatitude] = useState(0)
-  const [longitute, setLongitude] = useState(0)
+  const [longitude, setLongitude] = useState(0)
 
   useEffect(() => {
     useStoredValue({
@@ -19,7 +19,7 @@ export const useUserLocation = () => {
           })
         })
       },
-      onEvaluated: (data) => setLatitude(data.value),
+      onEvaluated: (latitude) => setLatitude(latitude),
     })
 
     useStoredValue({
@@ -34,12 +34,12 @@ export const useUserLocation = () => {
           })
         })
       },
-      onEvaluated: ({ value: longitude }) => setLongitude(longitude),
+      onEvaluated: (longitude) => setLongitude(longitude),
     })
   }, [])
 
   return {
-    lon: longitute,
+    lon: longitude,
     lat: latitude,
   }
 }
