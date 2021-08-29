@@ -34,8 +34,6 @@ export default ({ params, meta }) => {
   const satelliteName = useMemo(() => _.get(params, 'name') || _.get(tleInfo, 'name'), [params, tleInfo])
 
   const getSatInfo = useCallback(async (tle) => {
-    console.log('123')
-
     const location = await getLocation()
 
     const satInfo = useSatelliteLocation({
@@ -48,6 +46,7 @@ export default ({ params, meta }) => {
 
   useEffect(() => {
     const interval = setInterval(getSatInfo, INTERVAL_TIME)
+    const tleInfoName = _.get(tleInfo, 'name')
 
     const evaluateFuturePasses = async () => {
       const location = await getLocation()
@@ -56,18 +55,14 @@ export default ({ params, meta }) => {
         ...location,
       })
 
-      console.log({ location, passes })
-
       setFuturePasses(passes)
     }
 
-    if (tleInfo.name) {
+    if (tleInfoName) {
       evaluateFuturePasses()
     }
 
-    const tleInfoName = _.get(tleInfo, 'name')
-
-    if (meta.satelliteNoradId && !tleInfo.name) {
+    if (meta.satelliteNoradId && !tleInfoName) {
       // in a case of in-menu satellite usage we cache the tle for sometime
       useStoredValue({
         key: `SAT_STORED_VALUE_${meta.satelliteNoradId}`,

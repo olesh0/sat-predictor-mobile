@@ -40,7 +40,7 @@ export default () => {
         })
       })
     },
-    onEvaluated: (data) => setLatitude(data.value),
+    onEvaluated: (latitude) => setLatitude(latitude),
   })
 
   useStoredValue({
@@ -55,7 +55,7 @@ export default () => {
         })
       })
     },
-    onEvaluated: ({ value: longitude }) => setLongitude(longitude),
+    onEvaluated: (longitude) => setLongitude(longitude),
   })
 
   return (
