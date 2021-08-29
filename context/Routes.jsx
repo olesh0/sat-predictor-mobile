@@ -1,5 +1,21 @@
-import React, { useRef, useEffect, useState, lazy, Suspense } from 'react'
-import { View, StyleSheet, Text, TouchableOpacity, ScrollView, FlatList, Dimensions } from 'react-native'
+import React, {
+  useRef,
+  useEffect,
+  useState,
+  useMemo,
+  lazy,
+  Suspense,
+} from 'react'
+
+import {
+  View,
+  StyleSheet,
+  Text,
+  TouchableOpacity,
+  ScrollView,
+  FlatList,
+  Dimensions,
+} from 'react-native'
 import { Transition, Transitioning } from 'react-native-reanimated'
 
 // Importing screens
@@ -72,6 +88,11 @@ const menuItems = [
     title: () => 'Themes',
     component: lazy(() => import('../views/Themes')),
   },
+  {
+    name: '__CREDITS__',
+    title: () => 'Credits',
+    component: lazy(() => import('../views/Credits')),
+  },
 ]
 
 const width = Dimensions.get('window').width
@@ -79,14 +100,14 @@ const width = Dimensions.get('window').width
 export const NavigationProvider = ({ children }) => {
   const { Provider } = context
 
-  const screens = React.useMemo(() => [
+  const screens = useMemo(() => [
     ...nonMenuItems,
     ...menuItems.map((item) => ({ ...item, inMenuList: true })),
   ], [nonMenuItems, menuItems])
 
-  const [currentScreen, setCurrentScreen] = React.useState(null)
-  const [paramsToPass, setParamsToPass] = React.useState(null)
-  const [metaData, setMetaData] = React.useState(null)
+  const [currentScreen, setCurrentScreen] = useState(null)
+  const [paramsToPass, setParamsToPass] = useState(null)
+  const [metaData, setMetaData] = useState(null)
 
   const changeScreen = async (screenName, params = {}) => {
     const screen = screens.find(({ name }) => screenName === name)
