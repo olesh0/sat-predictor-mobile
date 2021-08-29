@@ -2,7 +2,6 @@ import SunCalc from 'suncalc'
 import moment from 'moment'
 
 import { TIME_FORMAT } from '../utils'
-import { getLocation } from '../utils/location'
 
 export const formatTime = (date) => {
   return {
@@ -20,9 +19,7 @@ export const radiansToDegress = (radians, { isAltitude = false } = {}) => {
   return !isAltitude && degress < 0 ? degress + 360 : degress
 }
 
-export const useSunData = async () => {
-  const { latitude, longitude } = await getLocation()
-
+export const useSunData = ({ lat: latitude, lon: longitude }) => {
   const times = SunCalc.getTimes(new Date(), latitude, longitude)
   const maxElevation = SunCalc.getPosition(times.solarNoon, latitude, longitude)
 

@@ -1,12 +1,13 @@
-import React, { useState, lazy, Suspense } from 'react'
+import React, { useRef, useEffect, useState, lazy, Suspense } from 'react'
 import { View, StyleSheet, Text, TouchableOpacity, ScrollView, FlatList, Dimensions } from 'react-native'
+import { Transition, Transitioning } from 'react-native-reanimated'
 
 // Importing screens
 import { Chevron } from '../components/icons/Chevron'
 import LoadingScreen from '../views/LoadingScreen'
 import { useTheme } from './Theme'
 
-const INITIAL_SCREEN = '__SATELLITES__'
+const INITIAL_SCREEN = '__SUN_AND_MOON__'
 
 const context = React.createContext({
   currentScreen: null,
@@ -14,6 +15,14 @@ const context = React.createContext({
   screens: [],
   changeScreen: () => {},
 })
+
+const menuTransition = (
+  <Transition.Together>
+    <Transition.In type="fade" durationMs={200} />
+    <Transition.Change />
+    <Transition.Out type="fade" durationMs={200} />
+  </Transition.Together>
+)
 
 const nonMenuItems = [
   {
@@ -89,7 +98,7 @@ export const NavigationProvider = ({ children }) => {
     setCurrentScreen(screen)
   }
 
-  React.useEffect(() => {
+  useEffect(() => {
     changeScreen(INITIAL_SCREEN)
   }, []);
 
@@ -123,6 +132,7 @@ export const Routes = () => {
   } = useNavigation()
 
   const menuListRoutes = screens.filter(({ inMenuList }) => inMenuList)
+  const ref = useRef()
 
   return (
     <Suspense
@@ -130,7 +140,11 @@ export const Routes = () => {
         <LoadingScreen />
       }
     >
-      <View style={MenuStyles.wrapper}>
+      <Transitioning.View
+        style={MenuStyles.wrapper}
+        transition={menuTransition}
+        ref={ref}
+      >
         <Text style={MenuStyles.heading}>Sat Predictor</Text>
 
         <ScrollView style={MenuStyles.content}>
@@ -147,11 +161,11 @@ export const Routes = () => {
         </ScrollView>
 
         <TouchableOpacity
-          style={[
-            MenuStyles.menu,
-            showFullMenu && { flex: 1 },
-          ]}
-          onPress={() => setShowFullMenu(!showFullMenu)}
+          style={[MenuStyles.menu]}
+          onPress={() => {
+            ref.current.animateNextTransition()
+            setShowFullMenu(!showFullMenu)
+          }}
         >
           {!showFullMenu && (
             <Text
@@ -205,7 +219,7 @@ export const Routes = () => {
             </ScrollView>
           )}
         </TouchableOpacity>
-      </View>
+      </Transitioning.View>
     </Suspense>
   )
 }
@@ -231,7 +245,10 @@ const MenuStylesGenerator = (theme) => (
       width,
     },
     content: {
-      flex: 1,
+      flexGrow: 1,
+    },
+    fullMenuStyles: {
+      flexGrow: 1,
     },
     menu: {
       padding: 20,

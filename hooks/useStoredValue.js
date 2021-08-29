@@ -23,10 +23,17 @@ export const useStoredValue = async ({ key, evaluationHandler, onEvaluated }) =>
       const parsedStoredKey = JSON.parse(storedKey)
       onEvaluated && onEvaluated(parsedStoredKey.value)
 
+      if (!parsedStoredKey.value) {
+        throw new Error('No results in stored value object...')
+      }
+
+      console.log('returned stored value...', key, parsedStoredKey)
+
       return Promise.resolve(parsedStoredKey)
     } catch (e) {
       const itemValue = await fetchValue()
       onEvaluated && onEvaluated(itemValue.value)
+      console.log('reevaluated stored value...', key)
 
       return Promise.resolve(itemValue.value)
     }

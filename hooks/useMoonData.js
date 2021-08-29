@@ -7,9 +7,7 @@ export const normalizeNumber = (number) => {
   return number.toString().replace(/\B(?=(\d{3})+(?!\d))/g, " ")
 }
 
-export const useMoonData = async () => {
-  const { latitude, longitude } = await getLocation()
-
+export const useMoonData = ({ lat: latitude, lon: longitude }) => {
   const times = SunCalc.getMoonTimes(new Date(), latitude, longitude)
   const current = SunCalc.getMoonPosition(new Date(), latitude, longitude)
 
