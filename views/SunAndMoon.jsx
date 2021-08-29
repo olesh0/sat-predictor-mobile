@@ -9,26 +9,30 @@ import DataList from '../components/DataList'
 import { useSunData, useMoonData } from '../hooks'
 import { calculatePing } from '../utils'
 import { useTheme } from '../context/Theme'
+import { useLocation } from '../context/LocationProvider'
+
+const DATA_CALCULATION_INTERVAL = 1500
 
 export default () => {
   const { theme } = useTheme()
+  const { lat, lon } = useLocation()
   const styles = stylesGenerator(theme)
 
   const [sun, setSun] = useState(null)
   const [moon, setMoon] = useState(null)
 
-  const calculateData = async () => {
-    setSun(await useSunData())
-    setMoon(await useMoonData())
+  const calculateData = async (location) => {
+    setSun(useSunData(location))
+    setMoon(useMoonData(location))
   }
 
   useEffect(() => {
-    calculateData()
+    calculateData({ lat, lon })
 
-    const internal = setInterval(calculateData, 1000)
+    const internal = setInterval(() => calculateData({ lat, lon }), DATA_CALCULATION_INTERVAL)
 
     return () => clearInterval(internal)
-  }, [])
+  }, [lat, lon])
 
   if (!sun || !moon) return <></>
 

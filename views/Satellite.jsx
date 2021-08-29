@@ -12,11 +12,12 @@ import { useSatelliteLocation, useSatelliteFuturePasses } from '../hooks'
 import { useSatelliteTle } from '../hooks'
 import { getElevationString } from '../utils'
 import { useStoredValue } from '../hooks/useStoredValue'
-import { getLocation } from '../utils/location'
+import { useLocation } from '../context/LocationProvider'
 
 const INTERVAL_TIME = 1000
 
 export default ({ params, meta }) => {
+  const { lat: latitude, lon: longitude } = useLocation()
   const [tleInfo, setTleInfo] = useState({
     name: null,
     line1: null,
@@ -34,11 +35,10 @@ export default ({ params, meta }) => {
   const satelliteName = useMemo(() => _.get(params, 'name') || _.get(tleInfo, 'name'), [params, tleInfo])
 
   const getSatInfo = useCallback(async (tle) => {
-    const location = await getLocation()
-
     const satInfo = useSatelliteLocation({
       ...(tle || tleInfo),
-      ...location,
+      latitude,
+      longitude,
     })
 
     setSatellite(satInfo)
@@ -49,10 +49,10 @@ export default ({ params, meta }) => {
     const tleInfoName = _.get(tleInfo, 'name')
 
     const evaluateFuturePasses = async () => {
-      const location = await getLocation()
       const passes = await useSatelliteFuturePasses({
         ...(tleInfo || {}),
-        ...location,
+        latitude,
+        longitude,
       })
 
       setFuturePasses(passes)

@@ -10,10 +10,11 @@ import { useNavigation } from '../context/Routes'
 import Loader from '../components/Loader'
 import { useTheme } from '../context/Theme'
 import { useSatelliteLocation } from '../hooks'
-import { getLocation } from '../utils/location'
 import { getElevationString } from '../utils'
+import { useLocation } from '../context/LocationProvider'
 
 const MAX_SAT_NAME_LENGTH = 10
+const DATA_CALCULATION_INTERVAL = 1500
 
 const PassInProgress = ({ elevation }) => {
   const { theme } = useTheme()
@@ -56,6 +57,7 @@ const PassInProgress = ({ elevation }) => {
 
 export default () => {
   const netInfo = useNetInfo()
+  const { lat: latitude, lon: longitude } = useLocation()
 
   const [satInfos, setSatInfos] = useState([])
   const [search, setSearch] = useState('')
@@ -70,13 +72,14 @@ export default () => {
   const { changeScreen } = useNavigation()
 
   useEffect(() => {
-    dispatch('satellites/fetchSats', { search: searchDebounced })
+    if (netInfo.isInternetReachable) {
+      dispatch('satellites/fetchSats', { search: searchDebounced })
+    }
   }, [searchDebounced, netInfo.isInternetReachable])
 
   useEffect(() => {
     const evaluateSatsInfos = async () => {
       try {
-        const { latitude, longitude } = await getLocation()
         const infos = satellites.member && satellites.member.map(({ name, line1, line2 }) => useSatelliteLocation({ name, line1, line2, latitude, longitude }))
 
         if (!infos) return
@@ -87,12 +90,12 @@ export default () => {
       }
     }
 
-    const satsInfoUpdateInterval = setInterval(evaluateSatsInfos, 1000)
+    const satsInfoUpdateInterval = setInterval(evaluateSatsInfos, DATA_CALCULATION_INTERVAL)
 
     evaluateSatsInfos()
 
     return () => clearInterval(satsInfoUpdateInterval)
-  }, [satellites])
+  }, [satellites, latitude, longitude])
 
   if (netInfo.isInternetReachable === false || netInfo.isConnected === false) {
     return (
