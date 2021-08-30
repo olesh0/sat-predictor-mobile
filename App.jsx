@@ -1,16 +1,26 @@
-import React from 'react';
-import * as Font from 'expo-font';
+import React from 'react'
+import * as Font from 'expo-font'
+import { StatusBar } from 'expo-status-bar'
 
 import { Provider as StoreProvider } from 'vuex-react'
 
 import store from './store'
 
 import Navigation from './Navigation'
-import ThemeProvider from './context/Theme'
+import ThemeProvider, { useTheme } from './context/Theme'
 import LoaderProvider from './context/Loader'
-import { LocationProvider } from './context/LocationProvider';
+import { LocationProvider } from './context/LocationProvider'
+
+import { THEME_DARK } from './themes/types'
 
 console.disableYellowBox = true;
+
+const AppStatusBar = () => {
+  const { theme } = useTheme()
+  const isThemeDark = theme.type === THEME_DARK
+
+  return <StatusBar style={isThemeDark ? "light" : "dark"} />
+}
 
 export default function App() {
   const [fontsLoaded, error] = Font.useFonts({
@@ -27,6 +37,8 @@ export default function App() {
       <ThemeProvider>
         <LoaderProvider>
           <LocationProvider>
+            <AppStatusBar />
+
             {fontsLoaded && <Navigation />}
           </LocationProvider>
         </LoaderProvider>
