@@ -84,6 +84,11 @@ const menuItems = [
     component: lazy(() => import('../views/UserCoords')),
   },
   {
+    name: '__CAMERA__',
+    title: () => 'Camera',
+    component: lazy(() => import('../views/Camera')),
+  },
+  {
     name: '__THEMES__',
     title: () => 'Themes',
     component: lazy(() => import('../views/Themes')),
