@@ -1,106 +1,175 @@
 import React, { useState, useEffect } from 'react'
-import { View, Text, StyleSheet, TouchableOpacity, Dimensions } from 'react-native'
+import { View, Text, StyleSheet, TouchableOpacity, Dimensions, Image, Alert, Button } from 'react-native'
 import { Camera } from 'expo-camera'
+import * as MediaLibrary from 'expo-media-library'
+import * as Permissions from 'expo-permissions'
 
 import { useLocation } from '../context/LocationProvider'
-import { useSunData, useMoonData } from '../hooks'
+import { useTheme } from '../context/Theme'
+// import { useSunData, useMoonData } from '../hooks'
+
+const PAGE_HORIZONTAL_PADDING = 20
+const { width: screenWidth, height: screenHeight } = Dimensions.get('window')
 
 export default () => {
+  const { theme } = useTheme()
+  const styles = stylesGenerator(theme)
+
   const [hasPermission, setHasPermission] = useState(null)
   const [type, setType] = useState(Camera.Constants.Type.back)
   const [camera, setCamera] = useState(null)
+  const [assetInformation, setAssetInformation] = useState(null)
 
-  const [qrCodeData, setQrCodeData] = useState(null)
+  // const location = useLocation()
+  // const moonData = useMoonData(location)
+  // const sunData = useSunData(location)
 
-  const location = useLocation()
-  const moonData = useMoonData(location)
-  const sunData = useSunData(location)
-
-  console.log({ moonData, sunData })
+  const saveImage = async () => {
+    await MediaLibrary.createAssetAsync(assetInformation.uri);
+    setAssetInformation(null)
+    alert('Image saved!')
+  }
 
   useEffect(() => {
-    Camera.requestPermissionsAsync()
-      .then(({ status }) => {
-        setHasPermission(status === 'granted')
-      })
+    Promise.all([
+      Permissions.askAsync(Permissions.CAMERA_ROLL),
+      Camera.requestPermissionsAsync(),
+    ]).then(([{ status: cameraRollPermissionStatus }, { status: cameraPermissionStatus }]) => {
+      setHasPermission(cameraRollPermissionStatus === "granted" && cameraPermissionStatus === "granted")
+    })
   }, [])
 
-  if (qrCodeData) {
+  if (!hasPermission) {
     return (
-      <View style={{ paddingVertical: 10, paddingHorizontal: 20 }}>
-        <Text style={{ color: '#FFF' }}>Data: {qrCodeData}</Text>
-        <TouchableOpacity style={{ color: '#FFF' }}>
-          <Text style={{ color: '#FFF' }} onPress={() => setQrCodeData(null)}>RESET</Text>
-        </TouchableOpacity>
+      <View style={styles.pageContainer}>
+        <Text style={{ color: '#FFF' }}>
+          No permission granted for the camera or storage...
+        </Text>
       </View>
     )
   }
 
-  if (!hasPermission) {
+  if (assetInformation) {
     return (
-      <View style={{ paddingVertical: 10, paddingHorizontal: 20 }}>
-        <Text style={{ color: '#FFF' }}>No permission granted for the camera...</Text>
+      <View style={styles.pageContainer}>
+        <Image
+          source={{ uri: assetInformation.uri }}
+          style={styles.camera}
+        />
+
+        <View style={styles.controlButtonsContainer}>
+          <TouchableOpacity
+            style={[
+              styles.flipControlButton,
+              {
+                width: ((screenWidth - (PAGE_HORIZONTAL_PADDING * 2)) / 2) - 50,
+                backgroundColor: theme.colors.colorHighlightRed,
+                borderRightColor: 0,
+              }
+            ]}
+            onPress={() => setAssetInformation(null)}
+          >
+            <Text style={styles.controlButtonText}>Reset</Text>
+          </TouchableOpacity>
+
+          <TouchableOpacity
+            style={[
+              styles.takeShotButton,
+              {
+                width: ((screenWidth - (PAGE_HORIZONTAL_PADDING * 2)) / 2) + 50,
+              }
+            ]}
+            onPress={saveImage}
+          >
+            <Text style={styles.controlButtonText}>Save the image</Text>
+          </TouchableOpacity>
+        </View>
       </View>
     )
   }
 
   return (
-    <View style={{ paddingVertical: 10, paddingHorizontal: 20 }}>
+    <View style={styles.pageContainer}>
       <Camera
         style={styles.camera}
         type={type}
         ref={(ref) => {
           setCamera(ref)
         }}
-        onBarCodeScanned={({ data }) => setQrCodeData(data)}
-      >
-        <View style={styles.buttonContainer}>
-          <TouchableOpacity
-            style={styles.button}
-            onPress={() => {
-              setType(
-                type === Camera.Constants.Type.back
-                  ? Camera.Constants.Type.front
-                  : Camera.Constants.Type.back
-              )
-            }}
-          >
-            <Text style={styles.text}>Flip</Text>
-          </TouchableOpacity>
-        </View>
-      </Camera>
+      />
 
-      <TouchableOpacity
-        style={styles.takeShotButton}
-        onPress={async () => {
-          if (camera) {
-            let photo = await camera.takePictureAsync({ base64: true })
+      <View style={styles.controlButtonsContainer}>
+        <TouchableOpacity
+          style={styles.flipControlButton}
+          onPress={() => {
+            setType(
+              type === Camera.Constants.Type.back
+                ? Camera.Constants.Type.front
+                : Camera.Constants.Type.back
+            )
+          }}
+        >
+          <Text style={styles.controlButtonText}>Flip</Text>
+        </TouchableOpacity>
 
-            console.log(photo)
-          }
-        }}
-      >
-        <Text style={styles.takeShot}>Take a shot</Text>
-      </TouchableOpacity>
+        <TouchableOpacity
+          style={styles.takeShotButton}
+          onPress={async () => {
+            if (camera) {
+              const photo = await camera.takePictureAsync()
+
+              setAssetInformation(photo)
+            }
+          }}
+        >
+          <Text style={styles.controlButtonText}>Take a picture</Text>
+        </TouchableOpacity>
+      </View>
     </View>
   )
 }
 
-const styles = StyleSheet.create({
-  camera: {
-    width: Dimensions.get('window').width - 40,
-    height: Dimensions.get('window').height - 200,
-  },
-  text: {
-    color: "#FFF"
-  },
-  takeShotButton: {
-    width: Dimensions.get('window').width - 40,
-    backgroundColor: '#444',
-    padding: 15,
-  },
-  takeShot: {
-    color: '#FFF',
-    textAlign: 'center'
-  },
-});
+const stylesGenerator = ({ colors }) => (
+  StyleSheet.create({
+    pageContainer: {
+      paddingVertical: 10,
+      paddingHorizontal: PAGE_HORIZONTAL_PADDING,
+    },
+    controlButtonsContainer: {
+      marginTop: 10,
+      flex: 1,
+      flexDirection: 'row',
+      justifyContent: 'space-between',
+    },
+    camera: {
+      width: screenWidth - (PAGE_HORIZONTAL_PADDING * 2),
+      height: screenHeight - 200,
+    },
+    text: {
+      color: colors.colorFontMain,
+    },
+    flipControlButton: {
+      backgroundColor: colors.colorHighlightGreen,
+      borderRightColor: colors.colorAccentGreen,
+      borderRightWidth: 1,
+      borderTopRightRadius: 0,
+      borderBottomRightRadius: 0,
+      width: ((screenWidth - (PAGE_HORIZONTAL_PADDING * 2)) / 2) - 100,
+      borderRadius: 2,
+      padding: 15,
+    },
+    takeShotButton: {
+      backgroundColor: colors.colorHighlightGreen,
+      width: ((screenWidth - (PAGE_HORIZONTAL_PADDING * 2)) / 2) + 100,
+      borderRadius: 2,
+      borderTopLeftRadius: 0,
+      borderBottomLeftRadius: 0,
+      padding: 15,
+    },
+    controlButtonText: {
+      color: '#FFF',
+      textAlign: 'center',
+      fontFamily: 'Orbitron-Regular',
+    },
+  })
+)

@@ -13,8 +13,6 @@ import { LocationProvider } from './context/LocationProvider'
 
 import { THEME_DARK } from './themes/types'
 
-console.disableYellowBox = true;
-
 const AppStatusBar = () => {
   const { theme } = useTheme()
   const isThemeDark = theme.type === THEME_DARK
