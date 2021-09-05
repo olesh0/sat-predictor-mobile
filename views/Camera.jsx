@@ -1,12 +1,12 @@
-import React, { useState, useEffect } from 'react'
-import { View, Text, StyleSheet, TouchableOpacity, Dimensions, Image, Alert, Button } from 'react-native'
+import React, { useState, useEffect, useRef } from 'react'
+import { View, Text, StyleSheet, TouchableOpacity, Dimensions, Image } from 'react-native'
 import { Camera } from 'expo-camera'
 import * as MediaLibrary from 'expo-media-library'
-import * as Permissions from 'expo-permissions'
+import ViewShot, { captureRef } from 'react-native-view-shot'
 
 import { useLocation } from '../context/LocationProvider'
 import { useTheme } from '../context/Theme'
-// import { useSunData, useMoonData } from '../hooks'
+import { useSunData, useMoonData } from '../hooks'
 
 const PAGE_HORIZONTAL_PADDING = 20
 const { width: screenWidth, height: screenHeight } = Dimensions.get('window')
@@ -19,10 +19,11 @@ export default () => {
   const [type, setType] = useState(Camera.Constants.Type.back)
   const [camera, setCamera] = useState(null)
   const [assetInformation, setAssetInformation] = useState(null)
+  const viewShotRef = useRef(null)
 
-  // const location = useLocation()
-  // const moonData = useMoonData(location)
-  // const sunData = useSunData(location)
+  const location = useLocation()
+  const moonData = useMoonData(location)
+  const sunData = useSunData(location)
 
   const saveImage = async () => {
     await MediaLibrary.createAssetAsync(assetInformation.uri);
@@ -32,7 +33,7 @@ export default () => {
 
   useEffect(() => {
     Promise.all([
-      Permissions.askAsync(Permissions.CAMERA_ROLL),
+      MediaLibrary.requestPermissionsAsync(),
       Camera.requestPermissionsAsync(),
     ]).then(([{ status: cameraRollPermissionStatus }, { status: cameraPermissionStatus }]) => {
       setHasPermission(cameraRollPermissionStatus === "granted" && cameraPermissionStatus === "granted")
@@ -90,13 +91,30 @@ export default () => {
 
   return (
     <View style={styles.pageContainer}>
-      <Camera
-        style={styles.camera}
-        type={type}
-        ref={(ref) => {
-          setCamera(ref)
-        }}
-      />
+      <ViewShot ref={viewShotRef} options={{ format: "jpg", quality: 0.9 }}>
+        <Camera
+          style={[
+            styles.camera,
+            { position: 'relative' }
+          ]}
+          type={type}
+          ref={(ref) => {
+            setCamera(ref)
+          }}
+        />
+
+        <View
+          style={{
+            backgroundColor: '#000',
+            width: screenWidth - (PAGE_HORIZONTAL_PADDING * 2),
+            position: 'absolute',
+            bottom: 50,
+            left: 0,
+          }}
+        >
+          <Text style={{ color: '#FFF' }}>kek lol</Text>
+        </View>
+      </ViewShot>
 
       <View style={styles.controlButtonsContainer}>
         <TouchableOpacity
@@ -116,9 +134,12 @@ export default () => {
           style={styles.takeShotButton}
           onPress={async () => {
             if (camera) {
-              const photo = await camera.takePictureAsync()
+              const uri = await captureRef(viewShotRef, {
+                format: "jpg",
+                quality: 0.8,
+              })
 
-              setAssetInformation(photo)
+              setAssetInformation({ uri })
             }
           }}
         >

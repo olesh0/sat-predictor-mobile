@@ -3,6 +3,7 @@ import * as Font from 'expo-font'
 import { StatusBar } from 'expo-status-bar'
 
 import { Provider as StoreProvider } from 'vuex-react'
+import { LogBox } from 'react-native'
 
 import store from './store'
 
@@ -12,6 +13,8 @@ import LoaderProvider from './context/Loader'
 import { LocationProvider } from './context/LocationProvider'
 
 import { THEME_DARK } from './themes/types'
+
+LogBox.ignoreAllLogs(true);
 
 const AppStatusBar = () => {
   const { theme } = useTheme()

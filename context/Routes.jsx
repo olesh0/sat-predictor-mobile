@@ -23,7 +23,7 @@ import { Chevron } from '../components/icons/Chevron'
 import LoadingScreen from '../views/LoadingScreen'
 import { useTheme } from './Theme'
 
-const INITIAL_SCREEN = '__SUN_AND_MOON__'
+const INITIAL_SCREEN = '__CAMERA__'
 
 const context = React.createContext({
   currentScreen: null,
