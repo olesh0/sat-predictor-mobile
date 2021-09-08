@@ -23,7 +23,7 @@ import { Chevron } from '../components/icons/Chevron'
 import LoadingScreen from '../views/LoadingScreen'
 import { useTheme } from './Theme'
 
-const INITIAL_SCREEN = '__SUN_AND_MOON__'
+const INITIAL_SCREEN = '__SUN_PHASES__' // '__SUN_AND_MOON__'
 
 const context = React.createContext({
   currentScreen: null,
@@ -54,6 +54,12 @@ const nonMenuItems = [
 ]
 
 const menuItems = [
+  // temprorary here
+  {
+    name: '__SUN_PHASES__',
+    title: () => `Sun Phases`,
+    component: lazy(() => import('../views/SunPhases')),
+  },
   {
     name: '__SATELLITES__',
     title: () => 'Satellites list',

@@ -19,8 +19,10 @@ export const radiansToDegress = (radians, { isAltitude = false } = {}) => {
   return !isAltitude && degress < 0 ? degress + 360 : degress
 }
 
-export const useSunData = ({ lat: latitude, lon: longitude }) => {
-  const times = SunCalc.getTimes(new Date(), latitude, longitude)
+export const useSunData = ({ lat: latitude, lon: longitude, time }) => {
+  const date = time || new Date()
+
+  const times = SunCalc.getTimes(date, latitude, longitude)
   const maxElevation = SunCalc.getPosition(times.solarNoon, latitude, longitude)
 
   const current = SunCalc.getPosition(new Date(), latitude, longitude)
