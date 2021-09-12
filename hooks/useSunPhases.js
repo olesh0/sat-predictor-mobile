@@ -1,6 +1,6 @@
 import moment from 'moment'
 import { useEffect, useState } from 'react'
-import { useSunData, useRange } from '.'
+import { useSunData, useRange } from '../hooks'
 
 const getCurrentYear = () => new Date().getFullYear()
 
