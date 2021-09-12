@@ -53,7 +53,7 @@ const nonMenuItems = [
   },
   {
     name: '__MONTH_SUN_PHASES__',
-    title: ({ monthName }) => `Sun Phase - ${monthName}`,
+    title: ({ monthName, year }) => `Sun Phase - ${monthName}, ${year}`,
     component: lazy(() => import('../views/SunPhases/MonthSunPhase')),
   },
 ]

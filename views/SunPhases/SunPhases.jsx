@@ -4,51 +4,62 @@ import { Picker } from '@react-native-picker/picker'
 import moment from 'moment'
 
 import { useLocation, useNavigation, useTheme } from '../../context'
-import { useSunPhases, useYearsRange } from '../../hooks'
+import { useSunPhases, useRange } from '../../hooks'
 
 const DAY_TIME_ONLY_FORMAT = "hh:mm A"
 
-export default () => {
+export default ({ params }) => {
   const { theme } = useTheme()
   const styles = stylesGenerator(theme)
 
   const defaultYear = new Date().getFullYear()
 
-  const [year, setYear] = useState(defaultYear)
+  const [year, setYear] = useState(params.year || defaultYear)
 
   const { changeScreen } = useNavigation()
   const location = useLocation()
   const phases = useSunPhases({ location, year })
-  const { years } = useYearsRange({ start: 1900, end: defaultYear + 1000 })
+  const years = useRange({ start: defaultYear - 100, end: defaultYear + 100 })
 
   return (
     <View style={{ paddingHorizontal: 20, paddingVertical: 0 }}>
       <View style={styles.pageHeader}>
         <Text style={[styles.title, styles.orbitronFont]}>Phases in {phases.year}</Text>
 
-        <Picker
-          selectedValue={year}
-          style={styles.yearPicker}
-          onValueChange={(itemValue) => setYear(itemValue)}
-        >
-          {years.map((localYear) => (
-            <Picker.Item
-              key={localYear}
-              label={String(localYear)}
-              value={localYear}
-            />
-          ))}
-        </Picker>
+        <View style={styles.pickerView}>
+          <Picker
+            selectedValue={year}
+            style={styles.yearPicker}
+            onValueChange={(itemValue) => setYear(itemValue)}
+          >
+            {years.map((localYear) => (
+              <Picker.Item
+                key={localYear}
+                label={String(localYear)}
+                value={localYear}
+              />
+            ))}
+          </Picker>
+        </View>
       </View>
 
       <FlatList
         data={phases.data}
         keyExtractor={(phase) => phase.monthName}
-        renderItem={({ item: phase }) => (
+        renderItem={({ item: phase, index: monthIndex }) => (
           <TouchableHighlight
             key={phase.monthName}
             style={styles.phaseWrapper}
-            onPress={() => changeScreen('__MONTH_SUN_PHASES__', { monthName: phase.monthName })}
+            onPress={() =>
+              changeScreen(
+                '__MONTH_SUN_PHASES__',
+                {
+                  monthName: phase.monthName,
+                  month: monthIndex,
+                  year,
+                }
+              )
+            }
           >
             <View style={styles.monthPhaseBlock}>
               <View style={styles.monthPhaseBlockHeader}>
@@ -91,13 +102,18 @@ const stylesGenerator = ({ colors }) => ({
     alignItems: "center",
     flexDirection: "row",
   },
+  pickerView: {
+    backgroundColor: colors.colorHighlightGreen,
+    borderRadius: 3,
+    width: 90,
+    height: 28,
+  },
   yearPicker: {
     display: "flex",
     alignItems: "center",
     color: colors.colorAccentGreen,
-    backgroundColor: colors.colorBgLight,
     fontSize: 15,
-    width: 50,
+    width: 100,
     height: 28,
   },
   title: {
