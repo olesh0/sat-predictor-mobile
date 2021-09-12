@@ -4,18 +4,9 @@ import { View, Text, FlatList, TouchableOpacity } from 'react-native'
 
 import { useLocation, useNavigation, useTheme } from '../../context'
 import { useMonthSunPhases } from '../../hooks'
-import { shortEnglishHumanizer } from '../../utils'
+import { getDayLength } from '../../utils'
 
 const TIME_ONLY_FORMAT = "hh:mm A"
-
-const getDayLength = ({ sunrise, sunset }) => {
-  const diff = moment(sunset).diff(sunrise)
-
-  return {
-    raw: diff,
-    formatted: shortEnglishHumanizer(diff),
-  }
-}
 
 const MonthSunPhase = ({ params }) => {
   const { theme } = useTheme()

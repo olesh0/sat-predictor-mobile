@@ -55,13 +55,17 @@ export default () => {
         <DataList
           style={{ marginTop: 10 }}
           data={[
-            { label: 'Today\'s max. elevation', value: `${sun.maxElevation.elevation.toFixed(2)}°` },
-            { label: 'Solar Noon', value: sun.noon.formatted },
-            { label: 'Sunrise', value: sun.sunrise.formatted },
+            { label: 'Max elevation today', value: `${sun.maxElevation.elevation.toFixed(2)}°` },
+            { label: 'Daylight duration', value: sun.daylightDuration.formatted },
+
+            { label: 'Sunrise', value: sun.sunrise.formatted, groupStart: true },
             { label: 'Sunset', value: sun.sunset.formatted },
-            { label: 'Dawn', value: sun.dawn.formatted },
+
+            { label: 'Dawn', value: sun.dawn.formatted, groupStart: true },
             { label: 'Dusk', value: sun.dusk.formatted },
-            { label: 'Nadir', value: sun.nadir.formatted },
+
+            { label: 'Nadir', value: sun.nadir.formatted, groupStart: true },
+            { label: 'Solar Noon', value: sun.noon.formatted },
           ]}
         />
       </View>
@@ -81,12 +85,13 @@ export default () => {
           data={[
             { label: 'Set', value: moon.set ? moon.set.formatted : '-' },
             { label: 'Rise', value: moon.rise ? moon.rise.formatted : '-' },
-            { label: 'Distance', value: moon.current.distance.formatted },
+
+            { label: 'Distance', value: moon.current.distance.formatted, groupStart: true },
             {
               label: 'Ping to moon',
               value: `${calculatePing(moon.current.distance.raw, { decimal: 2 }).formatted}s`,
             },
-            { label: 'Parallactic angle', value: `${moon.current.paralacticAngle.toFixed(2)}°` },
+            { label: 'Parallactic angle', value: `${moon.current.paralacticAngle.toFixed(2)}°`, groupStart: true },
           ]}
         />
       </View>

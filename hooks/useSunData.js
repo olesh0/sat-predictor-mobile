@@ -1,7 +1,7 @@
 import SunCalc from 'suncalc'
 import moment from 'moment'
 
-import { TIME_FORMAT } from '../utils'
+import { TIME_FORMAT, getDayLength } from '../utils'
 
 export const formatTime = (date) => {
   return {
@@ -34,6 +34,7 @@ export const useSunData = ({ lat: latitude, lon: longitude, time }) => {
     sunrise: formatTime(times.sunrise),
     nadir: formatTime(times.nadir),
     noon: formatTime(times.solarNoon),
+    daylightDuration: getDayLength({ sunrise: times.sunrise, sunset: times.sunset }),
     current: {
       azimuth: radiansToDegress(current.azimuth),
       elevation: radiansToDegress(current.altitude, { isAltitude: true }),

@@ -19,7 +19,7 @@ export default ({ data, ...props }) => {
         numColumns={1}
         renderItem={({ item }) => {
           return (
-            <View style={styles.dataListItem}>
+            <View style={[styles.dataListItem, item.groupStart && { marginTop: 8 }]}>
               <Text style={styles.listLabel}>{item.label}</Text>
               <Text style={styles.listValue}>{item.value}</Text>
             </View>
