@@ -1,13 +1,13 @@
 import React, { useState } from 'react'
-import { View, Text, FlatList, TouchableHighlight, Dimensions } from 'react-native'
+import { View, Text, FlatList, TouchableHighlight } from 'react-native'
+import { Picker } from '@react-native-picker/picker'
 import moment from 'moment'
 
 import { useLocation } from '../context/LocationProvider'
 import { useTheme } from '../context/Theme'
 
-import { useSunPhases } from '../hooks'
+import { useSunPhases, useYearsRange } from '../hooks'
 
-const SCREEN_WIDTH = Dimensions.get('window').width
 const DAY_TIME_ONLY_FORMAT = "hh:mm A"
 
 export default () => {
@@ -16,15 +16,31 @@ export default () => {
 
   const defaultYear = new Date().getFullYear()
 
-  const [selectedMonth, setSelectedMonth] = useState(null)
   const [year, setYear] = useState(defaultYear)
 
   const location = useLocation()
   const phases = useSunPhases({ location, year })
+  const { years } = useYearsRange({ start: 1900, end: defaultYear + 1000 })
 
   return (
     <View style={{ paddingHorizontal: 20, paddingVertical: 0 }}>
-      <Text style={[styles.title, styles.orbitronFont]}>Phases in {phases.year}</Text>
+      <View style={styles.pageHeader}>
+        <Text style={[styles.title, styles.orbitronFont]}>Phases in {phases.year}</Text>
+
+        <Picker
+          selectedValue={year}
+          style={styles.yearPicker}
+          onValueChange={(itemValue) => setYear(itemValue)}
+        >
+          {years.map((localYear) => (
+            <Picker.Item
+              key={localYear}
+              label={String(localYear)}
+              value={localYear}
+            />
+          ))}
+        </Picker>
+      </View>
 
       <FlatList
         data={phases.data}
@@ -32,14 +48,10 @@ export default () => {
         renderItem={({ item: phase, index }) => (
           <TouchableHighlight
             key={phase.monthName}
-            onPress={() => setSelectedMonth(index)}
             style={styles.phaseWrapper}
           >
             <View
-              style={[
-                styles.monthPhaseBlock,
-                index === selectedMonth ? styles.selectedMonth : {}
-              ]}
+              style={styles.monthPhaseBlock}
             >
               <View style={styles.monthPhaseBlockHeader}>
                 <Text style={[styles.headerMonthName, styles.orbitronFont]}>{phase.monthName}</Text>
@@ -70,20 +82,26 @@ export default () => {
           </TouchableHighlight>
         )}
       />
-
-      <Text
-        style={{
-          marginTop: 20,
-          color: "#FFF",
-          fontSize: 15,
-          fontFamily: "Orbitron-Regular",
-        }}
-      >{JSON.stringify(phases, null, 2)}</Text>
     </View>
   )
 }
 
 const stylesGenerator = ({ colors }) => ({
+  pageHeader: {
+    display: "flex",
+    justifyContent: "space-between",
+    alignItems: "center",
+    flexDirection: "row",
+  },
+  yearPicker: {
+    display: "flex",
+    alignItems: "center",
+    color: colors.colorAccentGreen,
+    backgroundColor: colors.colorBgLight,
+    fontSize: 15,
+    width: 50,
+    height: 28,
+  },
   title: {
     color: colors.colorFontMain,
     fontSize: 18,
@@ -121,9 +139,6 @@ const stylesGenerator = ({ colors }) => ({
   shortContentValue: {
     color: colors.colorAccentGreen,
     fontSize: 23,
-  },
-  selectedMonth: {
-    backgroundColor: colors.colorUltraHighlightGreen,
   },
   orbitronFont: {
     fontFamily: "Orbitron-Regular",
