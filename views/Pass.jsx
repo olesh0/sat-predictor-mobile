@@ -10,6 +10,8 @@ import { useTheme } from '../context/Theme'
 import { useSatelliteLocation } from '../hooks'
 import { getLocation } from '../utils/location'
 
+const PASS_DATE_FORMAT = "DD/MM hh:mm:ss"
+
 export default ({ params }) => {
   const { goBackParams } = params
   const tleInfo = {
@@ -84,8 +86,8 @@ export default ({ params }) => {
         ] : []),
 
         { label: 'Max elevation', value: `${pass.maxElevation.toFixed(0)}°` },
-        { label: 'Start time', value: moment(new Date(pass.start)).format('DD/MM HH:mm:ss') },
-        { label: 'End time', value: moment(new Date(pass.end)).format('DD/MM HH:mm:ss') },
+        { label: 'Start time', value: moment(new Date(pass.start)).format(PASS_DATE_FORMAT) },
+        { label: 'End time', value: moment(new Date(pass.end)).format(PASS_DATE_FORMAT) },
       ]
     } catch (e) {
       console.error(e)
