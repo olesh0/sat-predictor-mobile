@@ -3,10 +3,8 @@ import { View, Text, FlatList, TouchableHighlight } from 'react-native'
 import { Picker } from '@react-native-picker/picker'
 import moment from 'moment'
 
-import { useLocation } from '../context/LocationProvider'
-import { useTheme } from '../context/Theme'
-
-import { useSunPhases, useYearsRange } from '../hooks'
+import { useLocation, useNavigation, useTheme } from '../../context'
+import { useSunPhases, useYearsRange } from '../../hooks'
 
 const DAY_TIME_ONLY_FORMAT = "hh:mm A"
 
@@ -18,6 +16,7 @@ export default () => {
 
   const [year, setYear] = useState(defaultYear)
 
+  const { changeScreen } = useNavigation()
   const location = useLocation()
   const phases = useSunPhases({ location, year })
   const { years } = useYearsRange({ start: 1900, end: defaultYear + 1000 })
@@ -45,14 +44,13 @@ export default () => {
       <FlatList
         data={phases.data}
         keyExtractor={(phase) => phase.monthName}
-        renderItem={({ item: phase, index }) => (
+        renderItem={({ item: phase }) => (
           <TouchableHighlight
             key={phase.monthName}
             style={styles.phaseWrapper}
+            onPress={() => changeScreen('__MONTH_SUN_PHASES__', { monthName: phase.monthName })}
           >
-            <View
-              style={styles.monthPhaseBlock}
-            >
+            <View style={styles.monthPhaseBlock}>
               <View style={styles.monthPhaseBlockHeader}>
                 <Text style={[styles.headerMonthName, styles.orbitronFont]}>{phase.monthName}</Text>
                 <Text style={[styles.headerSubtitle, styles.orbitronFont]}>the first of {phase.monthName}</Text>
