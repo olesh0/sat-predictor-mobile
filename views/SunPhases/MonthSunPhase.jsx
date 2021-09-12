@@ -4,8 +4,18 @@ import { View, Text, FlatList, TouchableOpacity } from 'react-native'
 
 import { useLocation, useNavigation, useTheme } from '../../context'
 import { useMonthSunPhases } from '../../hooks'
+import { shortEnglishHumanizer } from '../../utils'
 
 const TIME_ONLY_FORMAT = "hh:mm A"
+
+const getDayLength = ({ sunrise, sunset }) => {
+  const diff = moment(sunset).diff(sunrise)
+
+  return {
+    raw: diff,
+    formatted: shortEnglishHumanizer(diff),
+  }
+}
 
 const MonthSunPhase = ({ params }) => {
   const { theme } = useTheme()
@@ -53,8 +63,8 @@ const MonthSunPhase = ({ params }) => {
             Sun elev.
           </Text>
 
-          <Text style={[styles.listItemMaxElevationAzimuth, styles.textGray]}>
-            Max elev. azimuth
+          <Text style={[styles.listItemDayDuration, styles.textGray]}>
+            Day duration
           </Text>
         </View>
 
@@ -79,17 +89,16 @@ const MonthSunPhase = ({ params }) => {
                 {dayInfo.maxElevation.elevation.toFixed(2)}°
               </Text>
 
-              <Text style={[styles.listItemMaxElevationAzimuth, styles.textWhite]}>
-                {(dayInfo.maxElevation.azimuth * (180 / Math.PI)).toFixed(2)}°
+              <Text style={[styles.listItemDayDuration, styles.textWhite]}>
+                {getDayLength({
+                  sunrise: dayInfo.sunrise.raw,
+                  sunset: dayInfo.sunset.raw,
+                }).formatted}
               </Text>
             </View>
           )}
         />
       </View>
-
-      <Text style={{ color: '#FFF' }}>
-        {JSON.stringify(monthData, null, 2)}
-      </Text>
     </View>
   )
 }
@@ -131,7 +140,7 @@ const stylesGenerator = ({ colors }) => ({
   listItemSunrise: { flex: 2 },
   listItemSunset: { flex: 2 },
   listItemElevation: { flex: 2 },
-  listItemMaxElevationAzimuth: { flex: 2 },
+  listItemDayDuration: { flex: 2 },
   backToPhasesView: {
     backgroundColor: colors.colorHighlightGreen,
     borderRadius: 3,
