@@ -20,6 +20,16 @@ const MonthSunPhase = ({ params }) => {
     month: params.month,
   })
 
+  const isCurrentDay = ({ year, month, day }) => {
+    const currentDate = new Date()
+
+    const isCorrectYear = currentDate.getFullYear() === year
+    const isCorrectMonth = currentDate.getMonth() === month
+    const isCorrectDay = currentDate.getDate() === day
+
+    return isCorrectYear && isCorrectMonth && isCorrectDay
+  }
+
   return (
     <View style={styles.page}>
       <View style={styles.pageHeader}>
@@ -62,32 +72,41 @@ const MonthSunPhase = ({ params }) => {
         <FlatList
           data={monthData}
           keyExtractor={(_, dayIndex) => dayIndex}
-          renderItem={({ item: dayInfo, index }) => (
-            <View style={styles.listItem}>
-              <Text style={styles.listItemDayIndex}>
-                {index + 1}
-              </Text>
+          renderItem={({ item: dayInfo, index }) => {
+            const day = index + 1
+            const currentDay = isCurrentDay({
+              year: params.year,
+              month: params.month,
+              day,
+            })
 
-              <Text style={[styles.listItemSunrise, styles.textWhite]}>
-                {moment(dayInfo.sunrise.raw).format(TIME_ONLY_FORMAT)}
-              </Text>
+            return (
+              <View style={[styles.listItem, currentDay && styles.currentDay]}>
+                <Text style={styles.listItemDayIndex}>
+                  {day}
+                </Text>
 
-              <Text style={[styles.listItemSunset, styles.textWhite]}>
-                {moment(dayInfo.sunset.raw).format(TIME_ONLY_FORMAT)}
-              </Text>
+                <Text style={[styles.listItemSunrise, styles.textWhite]}>
+                  {moment(dayInfo.sunrise.raw).format(TIME_ONLY_FORMAT)}
+                </Text>
 
-              <Text style={[styles.listItemElevation, styles.textWhite]}>
-                {dayInfo.maxElevation.elevation.toFixed(2)}°
-              </Text>
+                <Text style={[styles.listItemSunset, styles.textWhite]}>
+                  {moment(dayInfo.sunset.raw).format(TIME_ONLY_FORMAT)}
+                </Text>
 
-              <Text style={[styles.listItemDayDuration, styles.textWhite]}>
-                {getDayLength({
-                  sunrise: dayInfo.sunrise.raw,
-                  sunset: dayInfo.sunset.raw,
-                }).formatted}
-              </Text>
-            </View>
-          )}
+                <Text style={[styles.listItemElevation, styles.textWhite]}>
+                  {dayInfo.maxElevation.elevation.toFixed(2)}°
+                </Text>
+
+                <Text style={[styles.listItemDayDuration, styles.textWhite]}>
+                  {getDayLength({
+                    sunrise: dayInfo.sunrise.raw,
+                    sunset: dayInfo.sunset.raw,
+                  }).formatted}
+                </Text>
+              </View>
+            )
+          }}
         />
       </View>
     </View>
@@ -140,6 +159,15 @@ const stylesGenerator = ({ colors }) => ({
     paddingVertical: 5,
     paddingHorizontal: 10,
     color: colors.colorAccentGreen,
+  },
+  currentDay: {
+    borderBottomColor: colors.colorHighlightGreen,
+    borderBottomWidth: 1,
+
+    borderTopColor: colors.colorHighlightGreen,
+    borderTopWidth: 1,
+
+    paddingVertical: 5,
   },
 })
 
