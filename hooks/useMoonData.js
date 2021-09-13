@@ -1,6 +1,5 @@
 import SunCalc from 'suncalc'
 
-import { getLocation } from '../utils/location'
 import { formatTime, radiansToDegress } from './useSunData'
 
 export const normalizeNumber = (number) => {

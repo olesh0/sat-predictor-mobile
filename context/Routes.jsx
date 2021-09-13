@@ -51,9 +51,20 @@ const nonMenuItems = [
     title: ({ name }) => `Satellite - ${name}`,
     component: lazy(() => import('../views/Satellite')),
   },
+  {
+    name: '__MONTH_SUN_PHASES__',
+    title: ({ monthName, year }) => `Sun Phase - ${monthName}, ${year}`,
+    component: lazy(() => import('../views/SunPhases/MonthSunPhase')),
+  },
 ]
 
 const menuItems = [
+  // temprorary here
+  {
+    name: '__SUN_PHASES__',
+    title: () => `Sun Phases`,
+    component: lazy(() => import('../views/SunPhases/SunPhases')),
+  },
   {
     name: '__SATELLITES__',
     title: () => 'Satellites list',
