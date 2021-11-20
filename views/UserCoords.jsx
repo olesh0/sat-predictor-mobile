@@ -1,5 +1,6 @@
 import React, { useState } from 'react'
 import { View, StyleSheet, Text, Alert, TouchableOpacity } from 'react-native'
+import formatCoords from 'formatcoords'
 import _ from 'lodash'
 
 import { useStoredValue } from '../hooks/useStoredValue'
@@ -58,6 +59,17 @@ export default () => {
     onEvaluated: (longitude) => setLongitude(longitude),
   })
 
+  const [
+    formattedLatitude,
+    formattedLongitude,
+  ] = formatCoords(
+    latitude,
+    longitude
+  ).format(
+    'DD MM ss X',
+    { latLonSeparator: '|', decimalPlaces: 3 }
+  ).split('|')
+
   return (
     <View
       style={{
@@ -68,12 +80,12 @@ export default () => {
     >
       <View style={{ marginBottom: 10 }}>
         <Text style={styles.label}>Latitude</Text>
-        <Text style={styles.userCoordValue}>{latitude}</Text>
+        <Text style={styles.userCoordValue}>{formattedLatitude}</Text>
       </View>
 
       <View style={{ marginBottom: 10 }}>
         <Text style={styles.label}>Longitude</Text>
-        <Text style={styles.userCoordValue}>{longitude}</Text>
+        <Text style={styles.userCoordValue}>{formattedLongitude}</Text>
       </View>
 
       <TouchableOpacity

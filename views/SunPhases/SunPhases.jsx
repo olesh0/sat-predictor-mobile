@@ -12,7 +12,9 @@ export default ({ params }) => {
   const { theme } = useTheme()
   const styles = stylesGenerator(theme)
 
-  const defaultYear = new Date().getFullYear()
+  const currentDate = new Date()
+  const defaultYear = currentDate.getFullYear()
+  const currentMonth = currentDate.getMonth()
 
   const [year, setYear] = useState(params.year || defaultYear)
 
@@ -61,10 +63,24 @@ export default ({ params }) => {
               )
             }
           >
-            <View style={styles.monthPhaseBlock}>
+            <View
+              style={[
+                styles.monthPhaseBlock,
+                currentMonth === monthIndex && styles.activeMonth,
+              ]}
+            >
               <View style={styles.monthPhaseBlockHeader}>
                 <Text style={[styles.headerMonthName, styles.orbitronFont]}>{phase.monthName}</Text>
-                <Text style={[styles.headerSubtitle, styles.orbitronFont]}>the first of {phase.monthName}</Text>
+
+                <Text
+                  style={[
+                    styles.headerSubtitle,
+                    styles.orbitronFont,
+                    currentMonth === monthIndex && styles.colorWhite,
+                  ]}
+                  >
+                    the first of {phase.monthName}
+                  </Text>
               </View>
 
               <FlatList
@@ -82,7 +98,16 @@ export default ({ params }) => {
                 keyExtractor={(item) => item.fieldName}
                 renderItem={({ item }) => (
                   <View style={styles.monthPhaseBlockShortContentItem}>
-                    <Text style={[styles.shortContentKey, styles.orbitronFont]}>{item.fieldName}</Text>
+                    <Text
+                      style={[
+                        styles.shortContentKey,
+                        currentMonth === monthIndex && styles.colorWhite,
+                        styles.orbitronFont
+                      ]}
+                    >
+                      {item.fieldName}
+                    </Text>
+
                     <Text style={[styles.shortContentValue, styles.orbitronFont]}>{item.value}</Text>
                   </View>
                 )}
@@ -128,6 +153,12 @@ const stylesGenerator = ({ colors }) => ({
   monthPhaseBlock: {
     backgroundColor: colors.colorBgLight,
     padding: 20,
+  },
+  activeMonth: {
+    backgroundColor: colors.colorHighlightGreen,
+  },
+  colorWhite: {
+    color: colors.colorFontMain,
   },
   monthPhaseBlockHeader: {
     display: "flex",

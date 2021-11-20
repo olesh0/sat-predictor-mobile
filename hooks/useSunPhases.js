@@ -13,7 +13,7 @@ export const useSunPhases = ({
   useEffect(() => {
     const sunPhases = moment.months().map((monthName, monthIndex) => {
       const sunData = useSunData({
-        time: new Date(year, monthIndex),
+        time: new Date(year, monthIndex, 1),
         ...location,
       })
 
