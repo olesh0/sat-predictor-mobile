@@ -17,7 +17,6 @@ export default ({ children }) => {
   const { Provider } = themeContext
 
   useEffect(() => {
-    console.log('getting current theme...')
     getCurrentTheme().then(setTheme)
 
     return () => setTheme(noTheme)

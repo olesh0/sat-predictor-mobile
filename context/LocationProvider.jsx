@@ -6,8 +6,6 @@ const LocationContext = createContext(null)
 export const LocationProvider = ({ children }) => {
   const location = useUserLocation()
 
-  console.log({ USER_LOCATION: location })
-
   return (
     <LocationContext.Provider value={{ ...location }}>
       {children}

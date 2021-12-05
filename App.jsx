@@ -30,8 +30,6 @@ export default function App() {
     'Orbitron-Regular': require('./assets/orbitron/Orbitron-Regular.ttf'),
   })
 
-  console.log({ areFontsLoaded: Font.isLoaded('Orbitron-Black') }, error)
-
   return (
     <StoreProvider store={store}>
       <ThemeProvider>

@@ -2635,6 +2635,11 @@ convert-source-map@^1.7.0:
   dependencies:
     safe-buffer "~5.1.1"
 
+coordinator@^0.5.0:
+  version "0.5.0"
+  resolved "https://registry.yarnpkg.com/coordinator/-/coordinator-0.5.0.tgz#0afa9227d0798b6f58ae069cbf3cccd37acd79c1"
+  integrity sha1-CvqSJ9B5i29YrgacvzzM03rNecE=
+
 copy-descriptor@^0.1.0:
   version "0.1.1"
   resolved "https://registry.yarnpkg.com/copy-descriptor/-/copy-descriptor-0.1.1.tgz#676f6eb3c39997c2ee1ac3a924fd6124748f578d"
@@ -5380,6 +5385,11 @@ qs@^6.5.0:
   version "6.9.6"
   resolved "https://registry.yarnpkg.com/qs/-/qs-6.9.6.tgz#26ed3c8243a431b2924aca84cc90471f35d5a0ee"
   integrity sha512-TIRk4aqYLNoJUbd+g2lEdz5kLWIuTMRagAXxl78Q0RiVjAOugHmeKNGdd3cwo/ktpf9aL9epCfFqWDEKysUlLQ==
+
+qth-locator@^2.1.0:
+  version "2.1.0"
+  resolved "https://registry.yarnpkg.com/qth-locator/-/qth-locator-2.1.0.tgz#b346bb727fbee613f5e017b0b920d3a1915a1dbf"
+  integrity sha512-QeF5nF/xkqeWQ363GgdK+qS40II/AYxpTCfrfg/yhOaXVOEdP9JZYBN72utWGyGD3GNr31hg5ivZDELCUUbs5w==
 
 querystringify@^2.1.1:
   version "2.2.0"
