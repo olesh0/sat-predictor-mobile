@@ -3,7 +3,8 @@ import { View, StyleSheet, Text, Alert, TouchableOpacity } from 'react-native'
 import formatCoords from 'formatcoords'
 import _ from 'lodash'
 
-import { useStoredValue } from '../hooks/useStoredValue'
+import DataList from '../components/DataList'
+import { useStoredValue, useLocationStrings } from '../hooks'
 import { useTheme } from '../context/Theme'
 import { getLocation } from '../utils/location'
 
@@ -14,6 +15,8 @@ export default () => {
   const [latitude, setLatitude] = useState(0)
   const [longitude, setLongitude] = useState(0)
   const [disableButtons, setDisableButtons] = useState(false)
+
+  const locationStrings = useLocationStrings()
 
   const evaluateLocation = () => {
     setDisableButtons(true)
@@ -83,10 +86,22 @@ export default () => {
         <Text style={styles.userCoordValue}>{formattedLatitude}</Text>
       </View>
 
-      <View style={{ marginBottom: 10 }}>
+      <View>
         <Text style={styles.label}>Longitude</Text>
         <Text style={styles.userCoordValue}>{formattedLongitude}</Text>
       </View>
+
+      <DataList
+        style={{ marginBottom: 10 }}
+        listLabelStyles={{ flex: 0.3 }}
+        itemsMarginBottom={13}
+        data={
+          Object.entries(locationStrings).map(([label, value]) => ({
+            label,
+            value,
+          }))
+        }
+      />
 
       <TouchableOpacity
         style={[styles.button, styles.autoFetchCoordsButton, disableButtons && styles.disabledButton]}

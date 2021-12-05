@@ -2,6 +2,8 @@ import React from 'react'
 import { FlatList, StyleSheet, View, Text } from 'react-native'
 import { useTheme } from '../context/Theme'
 
+const ITEMS_MARGIN = 8
+
 export default ({ data, ...props }) => {
   const { theme } = useTheme()
   const styles = stylesGenerator(theme)
@@ -19,8 +21,13 @@ export default ({ data, ...props }) => {
         numColumns={1}
         renderItem={({ item }) => {
           return (
-            <View style={[styles.dataListItem, item.groupStart && { marginTop: 8 }]}>
-              <Text style={styles.listLabel}>{item.label}</Text>
+            <View
+              style={[
+                styles.dataListItem,
+                item.groupStart && { marginTop: props.itemsMarginBottom || ITEMS_MARGIN }
+              ]}
+            >
+              <Text style={[styles.listLabel, props.listLabelStyles]}>{item.label}</Text>
               <Text style={styles.listValue}>{item.value}</Text>
             </View>
           )
