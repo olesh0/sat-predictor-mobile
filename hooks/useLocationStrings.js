@@ -1,11 +1,19 @@
+import _ from 'lodash'
 import converter from 'coordinator'
-import { useUserLocation } from '../hooks'
 import { latLngToLocator } from 'qth-locator'
+
+import { useUserLocation } from '../hooks'
 
 const PRECISION = 4
 
 export const useLocationStrings = () => {
   const location = useUserLocation()
+  const latitude = _.get(location, 'lat')
+  const longitude = _.get(location, 'lon')
+
+  if (!latitude || !longitude) {
+    return {}
+  }
 
   const qth = latLngToLocator(location.lat, location.lon)
   const mgrs = converter('latlong', 'mgrs')(location.lat, location.lon, PRECISION)
